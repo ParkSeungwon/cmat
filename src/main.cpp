@@ -22,6 +22,6 @@ int main()
 	cout << m2 * mm.add_one();
 	cout << mm.theta(mm2) << endl;
 	cout << 4 * m2;
-	cout << m2.I();
+//	cout << m2.I();
 }
 

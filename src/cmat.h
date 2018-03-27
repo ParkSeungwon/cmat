@@ -106,4 +106,3 @@ template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>
 	Cmat() = default;
 	Cmat(std::initializer_list<T> li) : CmatBase<T,W,H>{li} {}
 };
-
