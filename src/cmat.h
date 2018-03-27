@@ -104,9 +104,8 @@ std::ostream& operator<<(std::ostream& o, const CmatBase<T, W, H>& r)
 	return o;
 }
 
-template<unsigned N> class CmatSquare : public CmatBase<float, N, N>
+template<unsigned N> struct CmatSquare : public CmatBase<float, N, N>
 {//middle base template class, not specialization, I() not possible <- recursion
-public:
 	CmatSquare(std::initializer_list<float> li) : CmatBase<float,N,N>{li} {}
 	CmatSquare() = default;
 	CmatSquare<N>& E() {
@@ -116,34 +115,35 @@ public:
 		return *this;
 	}
 	CmatSquare<N> I() const {
-		std::vector<float> v;
-		for(int j=0; j<N; j++) for(int i=0; i<N; i++) v.push_back((*this)[i][j]);
-		float ad_bc = det(v);
+		float ad_bc = det();
 		if(!ad_bc) throw "no inverse";
 		CmatSquare<N> m;
 		for(int i=0; i<N; i++) for(int j=0; j<N; j++)
-			m[j][i] = ((i+j) % 2 ? -1 : 1) * det(M(v, i, j)) / ad_bc;//transpose!!
+			m[j][i] = ((i+j) % 2 ? -1 : 1) * M(i, j).det() / ad_bc;//transpose!!
 		return m;
 	}
-private:
-	static std::vector<float> M(std::vector<float> v, int x, int y)
+	CmatSquare<N-1> M(int x, int y) const
 	{//v = linearized nXn size matrix, return a matrix except row x, col y 
-		int n = sqrt(v.size());
-		auto it = v.begin();
-		for(int j=0; j<n; j++) for(int i=0; i<n; i++)//[x][y] : y change first
-			if(x == i || y == j) it = v.erase(it);
-			else it++;
-		return v;
+		float ar[N * N];
+		for(int j=0,k=0; j<N; j++) for(int i=0; i<N; i++) 
+			if(x != i && y != j) ar[k++] = (*this)[i][j];
+		CmatSquare<N-1> m;
+		for(int j=0,k=0; j<N-1; j++) for(int i=0; i<N-1; i++) m[i][j] = ar[k++];
+		return m;
 	}
-	static float det(std::vector<float> v)//private static == f() const
+	float det() const//private static == f() const
 	{//ad - bc
-		if(v.size() == 1) return v[0];
-		int n = sqrt(v.size());
 		float sum = 0;
-		for(int i=0,j=1; i<n; i++, j*=-1) sum += j * v[i] * det(M(v, i, 0));
+		for(int i=0,j=1; i<N; i++, j*=-1) sum += j * (*this)[i][0] * M(i, 0).det();
 		return sum;
 	}
 };
+template<> struct CmatSquare<1> : public CmatBase<float, 1, 1>
+{//specialization for recursive det() terminator
+	CmatSquare() = default;
+	CmatSquare(std::initializer_list<float> li) : CmatBase<float, 1, 1>{li} {}
+	float det() const { return (*this)[0][0]; }
+};	
 
 
 template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>
