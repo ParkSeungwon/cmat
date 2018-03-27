@@ -28,5 +28,6 @@ int main()
 	cout << 4 * m2;
 //	cout << m2.I();
 	cout << m2.glrotateZ(3);
+	cout << m2.I() * m2;
 }
 

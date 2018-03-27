@@ -1,4 +1,5 @@
 #pragma once
+#include<vector>
 #include<sstream>
 #include<iomanip>
 #include<cassert>
@@ -102,6 +103,21 @@ std::ostream& operator<<(std::ostream& o, const CmatBase<T, W, H>& r)
 	return o;
 }
 
+static std::vector<float> M(std::vector<float> v, int x, int y) {
+	int n = sqrt(v.size());
+	auto it = v.begin();
+	for(int i=0; i<n; i++) for(int j=0; j<n; j++) 
+		if(x == i || y == j) it = v.erase(it);
+		else it++;
+	return v;
+}
+static float det(std::vector<float> v) {
+	if(v.size() == 1) return v[0];
+	int n = sqrt(v.size());
+	float sum = 0;
+	for(int i=0,j=1; i<n; i++, j*=-1) sum += j * v[i] * det(M(v, i, 0));
+	return sum;
+}
 template<unsigned N> class CmatSquare : public CmatBase<float, N, N>
 {//middle base template class, not specialization, I() not possible <- recursion
 public:
@@ -112,6 +128,16 @@ public:
 			if(i == j) (*this)[i][j] = 1;
 			else (*this)[i][j] = 0;
 		return *this;
+	}
+	CmatSquare<N> I() const {
+		std::vector<float> v;
+		for(int i=0; i<N; i++) for(int j=0; j<N; j++) v.emplace_back((*this)[i][j]);
+		float ad_bc = det(v);
+		if(!ad_bc) throw "no inverse";
+		CmatSquare<N> m;
+		for(int i=0; i<N; i++) for(int j=0; j<N; j++)
+			m[i][j] = ((i+j) % 2 ? -1 : 1) * det(M(v, j, i)) / ad_bc;
+		return m;
 	}
 //	CmatSquare<N> I() const {//inverse matrix
 //		Matrix<float> m{N, N};
@@ -126,16 +152,15 @@ public:
 };
 
 
-
-//template specializations
 template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>
-{//made base class to avoid repeatition in class functions
+{//Cmat template, made base class to avoid repeatition in specialized class definition
 	Cmat() = default;
 	Cmat(std::initializer_list<T> li) : CmatBase<T,W,H>{li} {}
 };
 
+//template specializations
 template<unsigned N> struct Cmat<float, N, N> : public CmatSquare<N>
-{//partial specialization for same interface
+{//partial square specialization for same interface
 	Cmat() = default;
 	Cmat(std::initializer_list<float> li) : CmatSquare<N>{li} {}
 };
@@ -160,7 +185,7 @@ template<class T, unsigned N> struct Cmat<T, 1, N> : public CmatBase<T, 1, N>
 		for(int i=0; i<N; i++) sum += (*this)[0][i] * (*this)[0][i];
 		return sqrt(sum);
 	}
-	Cmat<T, 1, N> normalize() {
+	Cmat<T, 1, N>& normalize() {
 		return *this /= abs();
 	}
 	float theta(const Cmat<T, 1, N>& r) const {
