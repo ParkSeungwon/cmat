@@ -103,24 +103,25 @@ std::ostream& operator<<(std::ostream& o, const CmatBase<T, W, H>& r)
 	return o;
 }
 
-static std::vector<float> M(std::vector<float> v, int x, int y) {
+static std::vector<float> M(std::vector<float> v, int x, int y)
+{//v = linearized nXn size matrix, return a matrix except row x, col y 
 	int n = sqrt(v.size());
 	auto it = v.begin();
-	for(int i=0; i<n; i++) for(int j=0; j<n; j++) 
+	for(int j=0; j<n; j++) for(int i=0; i<n; i++) 
 		if(x == i || y == j) it = v.erase(it);
 		else it++;
 	return v;
 }
-static float det(std::vector<float> v) {
+static float det(std::vector<float> v)
+{//ad - bc
 	if(v.size() == 1) return v[0];
 	int n = sqrt(v.size());
 	float sum = 0;
 	for(int i=0,j=1; i<n; i++, j*=-1) sum += j * v[i] * det(M(v, i, 0));
 	return sum;
 }
-template<unsigned N> class CmatSquare : public CmatBase<float, N, N>
+template<unsigned N> struct CmatSquare : public CmatBase<float, N, N>
 {//middle base template class, not specialization, I() not possible <- recursion
-public:
 	CmatSquare(std::initializer_list<float> li) : CmatBase<float,N,N>{li} {}
 	CmatSquare() = default;
 	CmatSquare<N>& E() {
@@ -131,24 +132,14 @@ public:
 	}
 	CmatSquare<N> I() const {
 		std::vector<float> v;
-		for(int i=0; i<N; i++) for(int j=0; j<N; j++) v.emplace_back((*this)[i][j]);
+		for(int j=0; j<N; j++) for(int i=0; i<N; i++) v.push_back((*this)[i][j]);
 		float ad_bc = det(v);
 		if(!ad_bc) throw "no inverse";
 		CmatSquare<N> m;
 		for(int i=0; i<N; i++) for(int j=0; j<N; j++)
-			m[i][j] = ((i+j) % 2 ? -1 : 1) * det(M(v, j, i)) / ad_bc;
+			m[j][i] = ((i+j) % 2 ? -1 : 1) * det(M(v, i, j)) / ad_bc;//transpose!!
 		return m;
 	}
-//	CmatSquare<N> I() const {//inverse matrix
-//		Matrix<float> m{N, N};
-//		for(int i=0; i<n; i++) for(int j=0; j<n; j++) m[i+1][j+1] = (*this)[i][j];
-//		try { m = m.I(); }
-//		catch(const char* e) { cerr << e << endl; }
-//		CmatSquare<N> r;
-//		for(int i=0; i<n; i++) for(int j=0; j<n; j++) r[i][j] = m[i+1][j+1];
-//		return r;
-//	}
-
 };
 
 
