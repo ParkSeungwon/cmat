@@ -1,5 +1,6 @@
 #include<iostream>
-#include"special.h"
+#include"1xN.h"
+#include"4x4.h"
 using namespace std;
 
 int main()
@@ -8,6 +9,8 @@ int main()
 		2,3,2,
 		3,3,3
 	}, m5;
+//	Cmat<float, 2,2> b;
+//	Cmat<float, 3,3> c;
 	Cmat<float, 4, 4> m2 = {
 		1,2,3,4,
 		23,2,2,2,
@@ -19,5 +22,6 @@ int main()
 	cout << m2 * mm.add_one();
 	cout << mm.theta(mm2) << endl;
 	cout << 4 * m2;
+	cout << m2.I();
 }
 

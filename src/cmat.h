@@ -1,3 +1,4 @@
+#pragma once
 #include<sstream>
 #include<iomanip>
 #include<cassert>
@@ -5,7 +6,7 @@
 template<class T, unsigned W, unsigned H> class CmatBase
 {//compile time matrix base class
 public:
-	CmatBase() {}
+	CmatBase() = default;
 	CmatBase(std::initializer_list<T> li) {
 		assert(li.size() == W * H);
 		auto it = li.begin();
@@ -99,4 +100,10 @@ std::ostream& operator<<(std::ostream& o, const CmatBase<T, W, H>& r) {
 	
 	return o;
 }
+
+template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>
+{//made base class to avoid repeatition in class functions
+	Cmat() = default;
+	Cmat(std::initializer_list<T> li) : CmatBase<T,W,H>{li} {}
+};
 
