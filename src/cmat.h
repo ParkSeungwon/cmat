@@ -14,8 +14,8 @@ public:
 		auto it = li.begin();
 		for(int j=0; j<H; j++) for(int i=0; i<W; i++) (*this)[i][j] = *it++;
 	}
-	const T* operator[](unsigned n) const { return arr[n]; } 
-	T* operator[](unsigned n) { return arr[n]; }
+	const T* operator[](unsigned n) const { return arr_[n]; } 
+	T* operator[](unsigned n) { return arr_[n]; }
 	template<unsigned R> CmatBase<T,R,H> operator*(const CmatBase<T,R,W>& r) const {
 		CmatBase<T, R, H> m;
 		for(int i=0; i<R; i++) for(int j=0; j<H; j++) 
@@ -74,7 +74,7 @@ public:
 	}
 
 protected:
-	T arr[W][H] = {{0,},};
+	T arr_[W][H] = {{0,},};
 };
 
 template <class T, unsigned W, unsigned H>
@@ -96,32 +96,17 @@ std::ostream& operator<<(std::ostream& o, const CmatBase<T, W, H>& r)
 		for(int x=0; x<W; x++) o << std::setw(gap[x]) << r[x][y] << ' ';
 		o << "\u23a5" << std::endl;
 	}
-	o << "\u23a3" << ' ';
-	for(int x=0; x<W; x++) o << std::setw(gap[x]) << r[x][H-1] << ' ';
-	o << "\u23a6" << std::endl;
-	
+	if(H > 1) {
+		o << "\u23a3" << ' ';
+		for(int x=0; x<W; x++) o << std::setw(gap[x]) << r[x][H-1] << ' ';
+		o << "\u23a6" << std::endl;
+	}
 	return o;
 }
 
-static std::vector<float> M(std::vector<float> v, int x, int y)
-{//v = linearized nXn size matrix, return a matrix except row x, col y 
-	int n = sqrt(v.size());
-	auto it = v.begin();
-	for(int j=0; j<n; j++) for(int i=0; i<n; i++) 
-		if(x == i || y == j) it = v.erase(it);
-		else it++;
-	return v;
-}
-static float det(std::vector<float> v)
-{//ad - bc
-	if(v.size() == 1) return v[0];
-	int n = sqrt(v.size());
-	float sum = 0;
-	for(int i=0,j=1; i<n; i++, j*=-1) sum += j * v[i] * det(M(v, i, 0));
-	return sum;
-}
-template<unsigned N> struct CmatSquare : public CmatBase<float, N, N>
+template<unsigned N> class CmatSquare : public CmatBase<float, N, N>
 {//middle base template class, not specialization, I() not possible <- recursion
+public:
 	CmatSquare(std::initializer_list<float> li) : CmatBase<float,N,N>{li} {}
 	CmatSquare() = default;
 	CmatSquare<N>& E() {
@@ -139,6 +124,24 @@ template<unsigned N> struct CmatSquare : public CmatBase<float, N, N>
 		for(int i=0; i<N; i++) for(int j=0; j<N; j++)
 			m[j][i] = ((i+j) % 2 ? -1 : 1) * det(M(v, i, j)) / ad_bc;//transpose!!
 		return m;
+	}
+private:
+	static std::vector<float> M(std::vector<float> v, int x, int y)
+	{//v = linearized nXn size matrix, return a matrix except row x, col y 
+		int n = sqrt(v.size());
+		auto it = v.begin();
+		for(int j=0; j<n; j++) for(int i=0; i<n; i++)//[x][y] : y change first
+			if(x == i || y == j) it = v.erase(it);
+			else it++;
+		return v;
+	}
+	static float det(std::vector<float> v)//private static == f() const
+	{//ad - bc
+		if(v.size() == 1) return v[0];
+		int n = sqrt(v.size());
+		float sum = 0;
+		for(int i=0,j=1; i<n; i++, j*=-1) sum += j * v[i] * det(M(v, i, 0));
+		return sum;
 	}
 };
 
@@ -165,10 +168,15 @@ template<class T, unsigned N> struct Cmat<T, 1, N> : public CmatBase<T, 1, N>
 		for(int i=0; i<N; i++) sum += (*this)[0][i] * r[0][i];
 		return sum;
 	}
-	Cmat<T, 1, N+1> add_one() const {
+	Cmat<T, 1, N+1> add_one() const {//x,y,z -> x,y,z,1
 		Cmat<T, 1, N+1> m;
 		for(int i=0; i<N; i++) m[0][i] = (*this)[0][i];
 		m[0][N] = 1;
+		return m;
+	}
+	Cmat<T, 1, N-1> del_one() const {
+		Cmat<T, 1, N-1> m;
+		for(int i=0; i<N-1; i++) m[0][i] = (*this)[0][i];
 		return m;
 	}
 	float abs() const {

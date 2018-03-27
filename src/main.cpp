@@ -21,6 +21,8 @@ int main()
 		4,4,7,0,
 		0,0,1,0
 	};
-	cout << m2.I() * m2 ;
+	cout << m2.I() << m2.I() * m2 ;
+	Cmat<int, 2,1> cm{1,2};
+	cout << cm;
 }
 
