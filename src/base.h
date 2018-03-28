@@ -66,7 +66,7 @@ public:
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) m[i][j] = m[i][j] / div;
 		return m;
 	}
-	CmatBase<T, W, H>& operator/=(T div) const {
+	CmatBase<T, W, H>& operator/=(T div) {
 		return *this = *this / div;
 	}
 	friend CmatBase<T, W, H> operator*(T mul, const CmatBase<T, W, H>& r) {
