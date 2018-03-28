@@ -1,5 +1,6 @@
 #include<iostream>
-#include"cmat.h"
+#include"vec.h"
+#include"4x4.h"
 using namespace std;
 
 int main()
