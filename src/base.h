@@ -62,7 +62,7 @@ public:
 		return *this = *this * mul;
 	}
 	CmatBase<T, W, H> operator/(T div) const {
-		CmatBase<T, H, W> m{*this};
+		CmatBase<T, W, H> m{*this};
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) m[i][j] = m[i][j] / div;
 		return m;
 	}

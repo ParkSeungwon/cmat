@@ -25,5 +25,11 @@ int main()
 	cout << m2.I() << m2.I() * m2 ;
 	Cmat<int, 2,1> cm{1,2};
 	cout << cm;
+
+	Cmat<float, 1, 3> v1{2,3,4}, v2{3,2,9};
+	auto v3 = v1.cross(v2);
+	cout << v3 << endl;
+	cout << v3.dot(v1) << endl;
+	cout << v1 / v1.abs() << endl;
 }
 
