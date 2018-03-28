@@ -31,8 +31,9 @@ template<class T, unsigned N> struct CmatVec : public CmatBase<T, 1, N>
 		for(int i=0; i<N; i++) sum += (*this)[0][i] * (*this)[0][i];
 		return sqrt(sum);
 	}
-	Cmat<T, 1, N>& normalize() {
-		return static_cast<CmatBase<T, 1, N>>(*this) /= abs();
+	CmatVec<T, N>& normalize() {
+		*this /= abs();
+		return *this;
 	}
 	float angle(const CmatVec<T, N>& r) const {
 		return acos(dot(r) / (abs() * r.abs()));
