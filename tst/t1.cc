@@ -7,6 +7,17 @@ TEST_CASE("base class test", "[base]") {
 	REQUIRE(cm[0][0] == 3);
 }
 
+TEST_CASE("class protected member access", "[other]") {
+	struct A {
+		int x_;
+	};
+	struct B : public A {
+		void x() {return x_;}
+	};
+
+	B b;
+	b.x();
+}
 
 
 

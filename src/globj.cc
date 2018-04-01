@@ -27,9 +27,9 @@ void GLObject::normals()
 	}
 	try{
 		for(int i=0; i<indices_.size(); i+=face) {
-			auto v1 = vertexes_[indices_[i+1]] - vertexes_[indices_[i]];
-			auto v2 = vertexes_[indices_[i+2]] - vertexes_[indices_[i]];
-			auto n = v1.cross(v2).normalize();
+			vec4 v1 = vertexes_[indices_[i+1]] - vertexes_[indices_[i]];
+			vec4 v2 = vertexes_[indices_[i+2]] - vertexes_[indices_[i]];
+			vec4 n = v1.cross(v2).normalize();
 			for(int j=0; j<face; j++)
 				normals_[indices_[i+j]] = normals_[indices_[i+j]] + n;
 		}
