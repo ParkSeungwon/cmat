@@ -1,0 +1,48 @@
+make -C gtk/
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/gtk' 들어감
+make[1]: 'all'을(를) 위해 할 일이 없습니다.
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/gtk' 나감
+make -C src/
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/src' 들어감
+make[1]: 'all'을(를) 위해 할 일이 없습니다.
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/src' 나감
+make -C tst/
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/tst' 들어감
+make[1]: 'all'을(를) 위해 할 일이 없습니다.
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/tst' 나감
+make -C obj/
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/obj' 들어감
+make[1]: 'all'을(를) 위해 할 일이 없습니다.
+make[1]: 디렉터리 '/home/zezeon/Programming/cmat/obj' 나감
+./catch.x
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+catch.x is a Catch v2.2.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+main class test
+-------------------------------------------------------------------------------
+t3.cc:8
+...............................................................................
+
+t3.cc:28: FAILED:
+  CHECK( (m2.I() * m2 == m.E()) )
+with expansion:
+  false
+with messages:
+  m := ⎡ -7.61419e-26 0 0 0 ⎤
+  ⎢  1.53877e-41 0 0 0 ⎥
+  ⎢            0 0 0 0 ⎥
+  ⎣            0 0 0 0 ⎦
+  initial square matrix
+  ⎡ -7.61419e-26 0 0 0 ⎤
+  ⎢  1.53877e-41 0 0 0 ⎥
+  ⎢            0 0 0 0 ⎥
+  ⎣            0 0 0 0 ⎦
+
+===============================================================================
+test cases:  3 |  2 passed | 1 failed
+assertions: 22 | 21 passed | 1 failed
+
+Makefile:2: 'all' 타겟에 대한 명령이 실패했습니다

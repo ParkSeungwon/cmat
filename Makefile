@@ -1,13 +1,12 @@
 all : 
 	make -C gtk/
 	make -C src/
-	make -C obj/
 	make -C tst/
+	make -C obj/
+	./catch.x
 
 PHONY : clean
 
 clean :
 	rm obj/*.?
-
-test :
-	make -C tst/ test
+	rm *.x

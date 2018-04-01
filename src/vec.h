@@ -10,13 +10,13 @@ template<class T, unsigned N> struct CmatVec : public CmatBase<T, 1, N>
 		for(int i=0; i<N; i++) sum += (*this)[0][i] * r[0][i];
 		return sum;
 	}
-	CmatVec<T, N+1> add_one() const {//x,y,z -> x,y,z,1
+	CmatVec<T, N+1> add_tail() const {//x,y,z -> x,y,z,1
 		CmatVec<T, N+1> m;
 		for(int i=0; i<N; i++) m[0][i] = (*this)[0][i];
 		m[0][N] = 1;
 		return m;
 	}
-	CmatVec<T, N-1> del_one() const {
+	CmatVec<T, N-1> remove_tail() const {
 		CmatVec<T, N-1> m;
 		for(int i=0; i<N-1; i++) m[0][i] = (*this)[0][i];
 		return m;

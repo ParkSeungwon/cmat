@@ -1,11 +1,13 @@
-CFLAG = -g -std=c++14 -fmax-errors=1 -pthread
-LDFlag = -lzezeon -lpthread -lmysqlcppconn
-INCLUDE = -I../
+CFLAG = -g -c -std=c++14 -fmax-errors=1 -pthread
+INCLUDE = -I../ -I../src/ -I../framework/ -I../database/ -I../tls/ -I/usr/include/jsoncpp 
 CC = g++
-OBJ = $(wildcard ../obj/*.o)
-MAIN_OBJ = $(patsubst %.cpp, ../%.x, $(wildcard *.cpp))
+TEST_EXE = $(patsubst %.cpp, ../obj/%.tx, $(wildcard *.cpp))
+TEST_OBJ = $(patsubst %.cc, ../obj/%.t, $(wildcard *.cc))
 
-all : $(MAIN_OBJ)
+all : $(TEST_EXE) $(TEST_OBJ)
 
-../%.x : %.cpp
-	$(CC) $(INCLUDE) $(CFLAG) $< -o $@ $(LDFLAG)
+../obj/%.t : %.cc
+	$(CC) $(INCLUDE) $(CFLAG) $< -o $@
+
+../obj/%.tx : %.cpp
+	$(CC) $(INCLUDE) $(CFLAG) $< -o $@

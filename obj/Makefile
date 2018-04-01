@@ -1,14 +1,14 @@
 CC = g++
 OBJ = $(wildcard *.o)
+TOBJ = $(wildcard *.t)
 EXE = $(patsubst %.x, ../%.x, $(wildcard *.x))
-TST = $(patsubst %.t, ../%.x, $(wildcard *.t))
+TST = $(patsubst %.tx, ../%.x, $(wildcard *.tx))
 
-all : $(EXE)
-test : $(TST)
+all : $(EXE) $(TST)
 
 ../%.x : %.x $(OBJ)
 	$(CC) -o $@ $< $(OBJ) 
 
-../%.x : %.t $(OBJ)
-	$(CC) -o $@ $< $(OBJ)
+../%.x : %.tx $(TOBJ) $(OBJ)
+	$(CC) -o $@ $< $(TOBJ) $(OBJ)
 

@@ -30,8 +30,10 @@ int main()
 	auto v3 = v1.cross(v2).normalize();
 	cout << "angle" << v1.angle(v2) << endl;
 	cout << v3 << endl;
-	cout << v3.dot(v1) << endl;
-	cout << v1 / v1.abs() << endl;
+	cout << v3.dot(v1) << endl;//v3 : v1
+	cout << v1;
+	cout << (v1 /= v1.abs()) << endl;
 	cout << v1.normalize() ;
+	cout << v1;
 }
 

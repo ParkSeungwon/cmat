@@ -35,14 +35,18 @@ template<unsigned N> struct CmatSquare : public CmatBase<float, N, N>
 		return sum;
 	}
 };
+
+//template member function specialization, static inline to avoid multiple definition
+//inline changes linkage behavior of compiler
+template<> inline float CmatSquare<1>::det() const { return (*this)[0][0]; }
+
+/* this part is not needed any more due to upper line
 template<> struct CmatSquare<1> : public CmatBase<float, 1, 1>
 {//specialization for recursive det() terminator
 	CmatSquare() = default;
 	CmatSquare(std::initializer_list<float> li) : CmatBase<float, 1, 1>{li} {}
 	float det() const { return (*this)[0][0]; }
-};	
-
-
+};*/	
 
 //template specializations
 template<unsigned N> struct Cmat<float, N, N> : public CmatSquare<N>

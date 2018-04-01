@@ -14,8 +14,12 @@ public:
 		auto it = li.begin();
 		for(int j=0; j<H; j++) for(int i=0; i<W; i++) (*this)[i][j] = *it++;
 	}
-	const T* operator[](unsigned n) const { return arr_[n]; } 
-	T* operator[](unsigned n) { return arr_[n]; }
+	CmatBase& O() {
+		for(int i=0; i<W; i++) for(int j=0; j<H; j++) arr_[i][j] = 0;
+	}
+
+	const std::array<T, H>& operator[](unsigned n) const { return arr_[n]; } 
+	std::array<T, H>& operator[](unsigned n) { return arr_[n]; }
 	template<unsigned R> CmatBase<T,R,H> operator*(const CmatBase<T,R,W>& r) const {
 		CmatBase<T, R, H> m;
 		for(int i=0; i<R; i++) for(int j=0; j<H; j++) 
@@ -40,12 +44,12 @@ public:
 	CmatBase<T, W, H>& operator-=(const CmatBase<T, W, H>& r) {
 		return *this = *this - r;
 	}
-	bool operator==(const CmatBase<T, W, H>& r) {
+	bool operator==(const CmatBase<T, W, H>& r) const {
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) 
 			if((*this)[i][j] != r[i][j]) return false;
 		return true;
 	}
-	bool operator!=(const CmatBase<T, W, H>& r) {
+	bool operator!=(const CmatBase<T, W, H>& r) const{
 		return !(*this == r);
 	}
 	CmatBase<T, H, W> transpose() const {
@@ -74,7 +78,7 @@ public:
 	}
 
 protected:
-	T arr_[W][H] = {{0,},};
+	std::array<std::array<T, H>, W> arr_;//if fundamental type no init
 };
 
 template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>

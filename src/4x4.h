@@ -43,7 +43,6 @@ template<> struct Cmat<float, 4, 4> : public CmatSquare<4>
 		(*this)[2][2] = z;
 		return *this;
 	}
-
 	Cmat<float, 4, 4> glortho(float left, float right,
 			float bottom, float top, float far, float near) {
 		E();
@@ -55,7 +54,6 @@ template<> struct Cmat<float, 4, 4> : public CmatSquare<4>
 		(*this)[3][2] = -(far + near) / (far - near);
 		return *this;
 	}
-
 	Cmat<float, 4, 4> glprojection(float left, float right, 
 			float bottom, float top, float far, float near) {
 		E();
