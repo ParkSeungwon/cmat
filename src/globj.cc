@@ -97,11 +97,8 @@ void GLObject::colors()
 	}
 
 	cout << "colors_ size : " << colors_.size() << endl;
-	for(auto& a : colors_) {
-		assert(a[0][0] >= -1 && a[0][0] <= 1);
-		assert(a[0][1] >= -1 && a[0][1] <= 1);
-		assert(a[0][2] >= -1 && a[0][2] <= 1);
-	}
+	for(auto& a : colors_) for(int i=0; i<3; i++) 
+		assert(a[0][i] >= -1 && a[0][i] <= 1);
 }
 
 void GLObject::normalize_vertex()
@@ -132,9 +129,6 @@ void GLObject::normalize_vertex()
 			a[0][i] *= 2;
 		}
 	}
-	for(auto& a : vertexes_) {
-		assert(a[0][0] >= -1 && a[0][0] <= 1);
-		assert(a[0][1] >= -1 && a[0][1] <= 1);
-		assert(a[0][2] >= -1 && a[0][2] <= 1);
-	}
+	for(auto& a : vertexes_) for(int i=0; i<3; i++) 
+		assert(a[0][i] >= -1 && a[0][i] <= 1);
 }
