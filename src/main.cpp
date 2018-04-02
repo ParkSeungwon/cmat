@@ -27,10 +27,10 @@ int main()
 	cout << cm;
 
 	Cmat<float, 1, 3> v1{0,0,4}, v2{1,0,0};
-	auto v3 = v1.cross(v2).normalize();
+	auto v3 = (v1 ^ v2).normalize();
 	cout << "angle" << v1.angle(v2) << endl;
 	cout << v3 << endl;
-	cout << v3.dot(v1) << endl;//v3 : v1
+	cout << (v3 , v1) << endl;//v3 : v1
 	cout << v1;
 	cout << (v1 /= v1.abs()) << endl;
 	cout << v1.normalize() ;

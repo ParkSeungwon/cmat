@@ -1,10 +1,13 @@
 #pragma once
+#include<GL/glew.h>
+#include<GLFW/glfw3.h>
 #include"square.h"
 
 template<> struct Cmat<float, 4, 4> : public CmatSquare<4>
 {//specialization for opengl
 	Cmat() = default;
 	Cmat(std::initializer_list<float> li) : CmatSquare<4>{li} {}
+	Cmat(CmatBase<float, 4, 4> r) { this->arr_ = r.arr_; }
 	Cmat<float, 4, 4> gltranslate(float x, float y, float z) {
 		E();
 		(*this)[3][0] = x;
@@ -66,5 +69,9 @@ template<> struct Cmat<float, 4, 4> : public CmatSquare<4>
 		(*this)[2][3] = -1;
 		(*this)[3][3] = 0;
 		return *this;
+	}
+	void gltransfer(unsigned shader_program, const char* var_name) const{
+		int fd = glGetUniformLocation(shader_program, var_name);
+		if(fd != -1) glUniformMatrix4fv(fd, 1, GL_FALSE, arr_.data()->data());
 	}
 };

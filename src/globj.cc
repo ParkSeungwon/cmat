@@ -1,6 +1,7 @@
 #include<fstream>
 #include<GL/glew.h>
 #include<highgui.h>
+#include<iostream>
 #include"globj.h"
 using namespace std;
 
@@ -29,7 +30,7 @@ void GLObject::normals()
 		for(int i=0; i<indices_.size(); i+=face) {
 			vec4 v1 = vertexes_[indices_[i+1]] - vertexes_[indices_[i]];
 			vec4 v2 = vertexes_[indices_[i+2]] - vertexes_[indices_[i]];
-			vec4 n = v1.cross(v2).normalize();
+			vec4 n = (v1.remove_tail() ^ v2.remove_tail()).normalize().add_tail();
 			for(int j=0; j<face; j++)
 				normals_[indices_[i+j]] = normals_[indices_[i+j]] + n;
 		}

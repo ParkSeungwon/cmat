@@ -31,9 +31,9 @@ TEST_CASE("main class test", "[base]") {
 	REQUIRE(1 == Approx(1.00001));
 	Cmat<int, 2,1> cm{1,2};
 	Cmat<float, 1, 3> v1{0,0,4}, v2{1,0,0};
-	auto v3 = v1.cross(v2).normalize();
+	auto v3 = (v1 ^ v2).normalize();
 	REQUIRE((v3 == Cmat<float, 1,3>{0,1,0}));
-	CHECK(0 == v3.dot(v1));
+	CHECK(0 == (v3 , v1));
 	REQUIRE(v1 /v1.abs() == v1.normalize());
 	for(int i=0; i<10; i++) REQUIRE(i == i);
 }

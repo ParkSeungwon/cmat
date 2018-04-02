@@ -5,9 +5,9 @@
 #include<cassert>
 #include<cmath>
 
-template<class T, unsigned W, unsigned H> class CmatBase
+template<class T, unsigned W, unsigned H> struct CmatBase
 {//compile time matrix base class
-public:
+	std::array<std::array<T, H>, W> arr_;//if fundamental type no init
 	CmatBase() = default;
 	CmatBase(std::initializer_list<T> li) {
 		assert(li.size() == W * H);
@@ -19,7 +19,7 @@ public:
 	}
 
 	const std::array<T, H>& operator[](unsigned n) const { return arr_[n]; } 
-	std::array<T, H>& operator[](unsigned n) { return arr_[n]; }
+	std::array<T, H>& operator[](unsigned n) { return arr_[n]; }//need arr_ public
 	template<unsigned R> CmatBase<T,R,H> operator*(const CmatBase<T,R,W>& r) const {
 		CmatBase<T, R, H> m;
 		for(int i=0; i<R; i++) for(int j=0; j<H; j++) 
@@ -76,9 +76,6 @@ public:
 	friend CmatBase<T, W, H> operator*(T mul, const CmatBase<T, W, H>& r) {
 		return r * mul;
 	}
-
-protected:
-	std::array<std::array<T, H>, W> arr_;//if fundamental type no init
 };
 
 template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>

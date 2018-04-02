@@ -12,7 +12,7 @@ TEST_CASE("class protected member access", "[other]") {
 		int x_;
 	};
 	struct B : public A {
-		void x() {return x_;}
+		int x() {return x_;}
 	};
 
 	B b;
