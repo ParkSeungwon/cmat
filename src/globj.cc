@@ -18,7 +18,7 @@ void GLObject::indices(vector<unsigned>&& v) { indices_ = move(v); }
 void GLObject::texture_file(string f) { texture_file_ = f; }
 void GLObject::normals()
 {///should come after setting mode
-	if(normals_.size() == vertexes_.size()) return;
+	if(normals_.size() == vertexes_.size()) return;//calculated normal present
 	normals_.resize(vertexes_.size());
 	int face;
 	switch(mode_) {
@@ -27,7 +27,7 @@ void GLObject::normals()
 		default: face = 3;
 	}
 	try{
-		for(int i=0; i<indices_.size(); i+=face) {
+		for(int i=0; i<indices_.size(); i+=face) {//calc normals
 			vec4 v1 = vertexes_[indices_[i+1]] - vertexes_[indices_[i]];
 			vec4 v2 = vertexes_[indices_[i+2]] - vertexes_[indices_[i]];
 			vec4 n = (v1.remove_tail() ^ v2.remove_tail()).normalize().add_tail();

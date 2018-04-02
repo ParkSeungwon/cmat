@@ -22,6 +22,7 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 	std::array<T, H>& operator[](unsigned n) { return arr_[n]; }//need arr_ public
 	template<unsigned R> CmatBase<T,R,H> operator*(const CmatBase<T,R,W>& r) const {
 		CmatBase<T, R, H> m;
+		m.O();
 		for(int i=0; i<R; i++) for(int j=0; j<H; j++) 
 			for(int k=0; k<W; k++) m[i][j] += (*this)[k][j] * r[i][k];
 		return m;
@@ -82,6 +83,7 @@ template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>
 {//Cmat template, made base class to avoid repeatition in specialized class definition
 	Cmat() = default;
 	Cmat(std::initializer_list<T> li) : CmatBase<T,W,H>{li} {}
+	Cmat(CmatBase<T, W, H> r) { this->arr_ = r.arr_; }
 };
 
 template <class T, unsigned W, unsigned H>
