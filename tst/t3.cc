@@ -23,17 +23,25 @@ TEST_CASE("main class test", "[base]") {
 		4,4,7,0,
 		0,0,1,0
 	}, m;
-	auto m3 = m2 * m2.I();
-	INFO("m2, m2 inverse, E" << m2 << m2.I() << m3);
-	for(int i=0; i<4; i++) for(int j=0; j<4; j++) 
-		if(i == j) REQUIRE(m3[i][j] == Approx(1));
-		else REQUIRE(m[i][j] == Approx(0));
-	REQUIRE(1 == Approx(1.00001));
-	Cmat<int, 2,1> cm{1,2};
-	Cmat<float, 1, 3> v1{0,0,4}, v2{1,0,0};
-	auto v3 = (v1 ^ v2).normalize();
-	REQUIRE((v3 == Cmat<float, 1,3>{0,1,0}));
-	CHECK(0 == (v3 , v1));
-	REQUIRE(v1 /v1.abs() == v1.normalize());
-	for(int i=0; i<10; i++) REQUIRE(i == i);
+	SECTION("inverse") {
+		auto m3 = m2 * m2.I();
+		INFO("m2, m2 inverse, E\n" << m2 << m2.I() << m3);
+		for(int i=0; i<4; i++) for(int j=0; j<4; j++) 
+			if(i == j) REQUIRE(m3[i][j] == Approx(1));
+			else REQUIRE(m[i][j] == Approx(0));
+	}
+	SECTION("others") {
+		REQUIRE(1 == Approx(1.00001));
+		Cmat<int, 2,1> cm{1,2};
+		Cmat<float, 1, 3> v1{0,0,4}, v2{1,0,0};
+		auto v3 = (v1 ^ v2).normalize();
+		REQUIRE((v3 == Cmat<float, 1,3>{0,1,0}));
+		CHECK(0 == (v3 , v1));
+		REQUIRE(v1 /v1.abs() == v1.normalize());
+		for(int i=0; i<10; i++) REQUIRE(i == i);
+	}
+	SECTION("column first continuous memory align") {
+		auto* p = b.arr_.data()->data();
+		for(int i=0; i<3; i++) for(int j=0; j<4; j++) REQUIRE(b[i][j] == *p++);
+	}
 }
