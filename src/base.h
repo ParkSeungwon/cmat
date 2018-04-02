@@ -10,7 +10,7 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 	std::array<std::array<T, H>, W> arr_;//if fundamental type no init
 	CmatBase() = default;
 	CmatBase(std::initializer_list<T> li) {
-		assert(li.size() == W * H);
+		//assert(li.size() == W * H);
 		auto it = li.begin();
 		for(int j=0; j<H; j++) for(int i=0; i<W; i++) (*this)[i][j] = *it++;
 	}
@@ -59,7 +59,7 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 		return m;
 	}
 	CmatBase<T, W, H> operator*(T mul) const {
-		CmatBase<T, H, W> m{*this};
+		CmatBase<T, W, H> m{*this};
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) m[i][j] = m[i][j] * mul;
 		return m;
 	}

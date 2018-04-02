@@ -9,8 +9,8 @@ cvLIB = $(shell pkg-config opencv --libs)
 all : $(EXE) $(TST)
 
 ../%.x : %.x $(OBJ)
-	$(CC) -o $@ $< $(OBJ) $(GLLIB) $(cvLIB)
+	$(CC) -o $@ $< $(OBJ) $(GLLIB) $(cvLIB) -lpthread
 
 ../%.x : %.tx $(TOBJ) $(OBJ)
-	$(CC) -o $@ $< $(TOBJ) $(OBJ) $(GLLIB) $(cvLIB)
+	$(CC) -o $@ $< $(TOBJ) $(OBJ) $(GLLIB) $(cvLIB) -lpthread
 
