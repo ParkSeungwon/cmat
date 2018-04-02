@@ -3,7 +3,9 @@
 #include<highgui.h>
 #include<iostream>
 #include"globj.h"
-#include"glutil.h"
+bool glinit(GLFWwindow* window);
+void init_globjects();
+unsigned make_shader_program(std::string v, std::string f);
 using namespace std;
 
 static string vshader = R"(
