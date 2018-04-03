@@ -42,13 +42,13 @@ void generate_enemy()
 	vec4 pos;
 	unique_lock<mutex> lock{mtx2, defer_lock};
 	while(!end_game) {//initial x,y,z position
-		pos[1][1] = di(rd); 
-		pos[1][2] = di(rd); 
-		pos[1][3] = -14; 
-		pos[1][4] = di2(rd);//buddha or ironman
+		pos[0][0] = di(rd); 
+		pos[0][1] = di(rd); 
+		pos[0][2] = -14; 
+		pos[0][3] = di2(rd);//enemy type
 		enemies.push_back(pos);
 		lock.lock();
-		while(!enemies.empty() && enemies.front()[1][3] > -5) enemies.pop_front();
+		while(!enemies.empty() && enemies.front()[0][2] > -5) enemies.pop_front();
 		lock.unlock();
 		this_thread::sleep_for(2s);
 	}
@@ -60,9 +60,9 @@ void detect_crash()
 		lock(mtx1, mtx2);
 		for(auto& a : bullets) for(auto& b : enemies) {
 			auto m = a.pos_ - b;
-			if(m[1][1] * m[1][1] + m[1][2] * m[1][2] + m[1][3] * m[1][3] < 0.1) {
-				a.pos_[1][3] = -100;
-				b[1][3] = 100;
+			if(m[0][0] * m[0][0] + m[0][1] * m[0][1] + m[0][2] * m[0][2] < 0.1) {
+				a.pos_[0][2] = -100;//move out of screen
+				b[0][2] = 100;//move out of screen
 			}
 		}		
 		mtx1.unlock();
@@ -98,8 +98,8 @@ int main()
 		objs(0);//spaceship
 		lock2.lock();
 		for(auto& a : enemies) {
-			objs.matrix(proj * m.gltranslate(a[0][0],a[0][1],a[0][2]) * objs[a[0][2]]);
-			objs(a[0][2]);//enemy
+			objs.matrix(proj * m.gltranslate(a[0][0],a[0][1],a[0][2]) * objs[a[0][3]]);
+			objs(a[0][3]);//enemy
 			a[0][2] += 0.05;//advance forward
 		}
 		lock2.unlock();
