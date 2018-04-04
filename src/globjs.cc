@@ -91,7 +91,7 @@ GLObjs& GLObjs::operator+=(GLObject& r)
 }
 
 void GLObjs::fill_texture_num() 
-{
+{//assign number according to texture file
 	int n = 0;
 	vector<string> v;
 	for(string s : texture_files_) {
@@ -119,6 +119,7 @@ void GLObjs::matrix(const mat4& m)
 
 unsigned GLObjs::transfer_all()
 {
+	load_alphabet();
 	fill_texture_num();
 	unsigned r = read_texture();
 	vbo[0] = transfer_data(vertexes_, "vertexes_");
@@ -246,3 +247,20 @@ unsigned GLObjs::transfer_data(const vector<vec4>& v, const char* var,
 	return vbo;
 }
 
+void GLObjs::load_alphabet()
+{
+	char c[] = "?.obj";
+	GLObject alphabet[36];
+	int i=0;
+	mat4 m;
+	for(c[0]='A'; i<26; c[0]++, i++) {
+		alphabet[i].read_obj_file(c);
+		alphabet[i].texture_file("marble.jpg");
+		alphabet[i].matrix(m.glrotateX(-0.5 * M_PI));
+	}
+	for(c[0]='0'; i<36; c[0]++, i++) {
+		alphabet[i].read_obj_file(c);
+		alphabet[i].texture_file("marble.jpg");
+	}
+	for(i=0; i<36; i++) *this += alphabet[i];
+}

@@ -14,6 +14,7 @@ bool glinit(GLFWwindow* window);
 void init_globjects();
 extern float thz, dest_x, dest_y, dest_z;
 extern GLObjs objs;
+extern mat4 KeyBindMatrix;
 float x, y;//cur xy
 
 deque<Projectile> bullets;
@@ -112,6 +113,8 @@ int main()
 			objs(7);//bullet
 		}
 		lock1.unlock();
+		objs.matrix(proj * KeyBindMatrix * m.gltranslate(0, 0, -10) * objs[8]);
+		objs(8);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

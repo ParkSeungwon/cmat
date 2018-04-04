@@ -65,6 +65,7 @@ protected:
 private:
 	unsigned read_texture();
 	void fill_texture_num();
+	void load_alphabet();
 };
 
 
