@@ -74,4 +74,6 @@ template<> struct Cmat<float, 4, 4> : public CmatSquare<4>
 		int fd = glGetUniformLocation(shader_program, var_name);
 		if(fd != -1) glUniformMatrix4fv(fd, 1, GL_FALSE, arr_.data()->data());
 	}
+//	Cmat<float, 4, 4> glrotate(Cmat<float, 1, 3> to, Cmat<float, 1, 3> from={0,0,1}) {
+//		Cmat<float, 1, 4> st_norm = {
 };

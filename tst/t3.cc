@@ -25,7 +25,7 @@ TEST_CASE("main class test", "[base]") {
 	}, m;
 	SECTION("inverse") {
 		auto m3 = m2 * m2.I();
-		INFO("m2, m2 inverse, E\n" << m2 << m2.I() << m3);
+		INFO("E\n" << m3);
 		for(int i=0; i<4; i++) for(int j=0; j<4; j++) 
 			if(i == j) REQUIRE(m3[i][j] == Approx(1));
 			else REQUIRE(m[i][j] == Approx(0));

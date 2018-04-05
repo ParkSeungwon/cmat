@@ -7,6 +7,7 @@
 #include"projectile.h"
 #include"globj.h"
 #include"vec.h"
+#include"plane.h"
 #include"4x4.h"
 #define STEP 0.05
 using namespace std;
@@ -74,6 +75,7 @@ void detect_crash()
 
 int main()
 {
+	TextPlane tp;
 	if (!glfwInit()) return -1;
 	GLFWwindow* window = glfwCreateWindow(1024, 1024, "Space War", NULL, NULL);
 	if (!glinit(window)) return -1;
@@ -84,6 +86,7 @@ int main()
 	unique_lock<mutex> lock1{mtx1, defer_lock}, lock2{mtx2, defer_lock};
 	thread th1{generate_bullet}, th2{generate_enemy}, th3{detect_crash};
 
+	string text = "THIS IS A TEST";
 	while (!glfwWindowShouldClose(window)) {
 		if(abs(dest_x - x) >= STEP || abs(dest_y - y) >= STEP) {//move ship x,y
 			complex<float> to{dest_x, dest_y};
@@ -113,8 +116,12 @@ int main()
 			objs(7);//bullet
 		}
 		lock1.unlock();
-		objs.matrix(proj * KeyBindMatrix * m.gltranslate(0, 0, -10) * objs[8]);
-		objs(8);
+		tp.setxy(0, 25);
+		for(char c : text) {
+			if(c == ' ') { tp.next(); continue; }
+			objs.matrix(proj * KeyBindMatrix * m.gltranslate(0, 0, -10) * tp.next() * objs[8+(c - 'A')]);
+			objs(8+ (c-'A'));
+		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

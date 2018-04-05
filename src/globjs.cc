@@ -264,3 +264,4 @@ void GLObjs::load_alphabet()
 	}
 	for(i=0; i<36; i++) *this += alphabet[i];
 }
+

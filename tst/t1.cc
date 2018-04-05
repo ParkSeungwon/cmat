@@ -1,23 +1,31 @@
 #include<catch.hpp>
+#include<chrono>
+#include"vec.h"
 #include"4x4.h"
+#include"plane.h"
+using namespace std::chrono;
+using mat4 = Cmat<float, 4, 4>;
+using vec4 = Cmat<float, 1, 4>;
 
-TEST_CASE("base class test", "[base]") {
-	Cmat<float, 2, 2> cm{3,4,5,6};
-	CAPTURE(cm);
-	REQUIRE(cm[0][0] == 3);
+//class TPlane : public Plane
+//{
+//public:
+//	TPlane(vec3 x, vec3 y, vec3 z) : Plane(x,y,z) {}
+//	float xth() {return xth_;}
+//	float yth() {return yth_;}
+//	vec3 normal() {return normal_;}
+//};
+
+TEST_CASE("plane test", "[plane]") {
+//	TPlane p{{0,0,0},{1,0,0},{0,-1,2.3}};
+//	REQUIRE(vec3{1,0,0}.angle({1,1,0}) == Approx(M_PI/4));//inter angle
+//	REQUIRE(vec3{1,0,0}.angle({1,-1,0}) == Approx(M_PI/4));//same inter angle
+//	REQUIRE((vec3{1,0,0} ^ vec3{0,1,0}) == vec3{0,0,1});//left turn upward
+//	REQUIRE((vec3{1,0,0} ^ vec3{0,-1,0}) == vec3{0,0,-1});
+//	mat4 rx, ry;
+//	rx.glrotateX(p.xth());
+//	ry.glrotateY(p.yth());
+//	auto n = rx * ry * vec4{0,0,1,1};
+
+//	WARN("normal" << n << p.normal());
 }
-
-TEST_CASE("class protected member access", "[other]") {
-	struct A {
-		int x_;
-	};
-	struct B : public A {
-		int x() {return x_;}
-	};
-
-	B b;
-	b.x();
-}
-
-
-
