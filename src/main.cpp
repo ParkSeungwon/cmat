@@ -26,7 +26,7 @@ bool end_game = false;
 void generate_bullet()
 {
 	unique_lock<mutex> lock{mtx1, defer_lock};
-	while(!end_game) {
+	while(!end_game) {//projectile{position, velocity}
 		bullets.push_back(Projectile{{x+0.2*cos(thz), y+0.2*sin(thz), 4}, {0,0,-2}});
 		bullets.push_back(Projectile{{x-0.2*cos(thz), y-0.2*sin(thz), 4}, {0,0,-2}});
 		lock.lock();
@@ -86,7 +86,9 @@ int main()
 	unique_lock<mutex> lock1{mtx1, defer_lock}, lock2{mtx2, defer_lock};
 	thread th1{generate_bullet}, th2{generate_enemy}, th3{detect_crash};
 
-	string text = "THIS IS A TEST";
+	string text = R"(THIS IS A TEST
+HELLO WORLD01293827492874893
+LONG LONG TIME AGO IN A  FAR FAR AWAY GALAXY)";
 	while (!glfwWindowShouldClose(window)) {
 		if(abs(dest_x - x) >= STEP || abs(dest_y - y) >= STEP) {//move ship x,y
 			complex<float> to{dest_x, dest_y};
@@ -118,9 +120,13 @@ int main()
 		lock1.unlock();
 		tp.setxy(0, 25);
 		for(char c : text) {
-			if(c == ' ') { tp.next(); continue; }
-			objs.matrix(proj * KeyBindMatrix * m.gltranslate(0, 0, -10) * tp.next() * objs[8+(c - 'A')]);
-			objs(8+ (c-'A'));
+			if(('A' <= c && c <= 'Z') || ('0' <= c && c <= '9')) {
+				int k = c >= 'A' ? 8 + c - 'A' : 34 + c - '0';
+				objs.matrix(proj * KeyBindMatrix * m.gltranslate(0, 0, -10) * 
+						tp.next() * objs[k]);
+				objs(k);
+			} else if(c == '\n') tp.next_line();
+			else tp.next();
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();

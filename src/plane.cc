@@ -52,7 +52,7 @@ mat4 TextPlane::next()
 
 mat4 TextPlane::next_line()
 {
-	return trans_xy(x_=1, ++y_);
+	return trans_xy(x_=0, ++y_);
 }
 
 void TextPlane::setxy(int x, int y)
