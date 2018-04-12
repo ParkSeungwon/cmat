@@ -5,6 +5,7 @@
 #include<cassert>
 #include<cmath>
 
+template<class T, unsigned W, unsigned H> struct Cmat;
 template<class T, unsigned W, unsigned H> struct CmatBase
 {//compile time matrix base class
 	std::array<std::array<T, H>, W> arr_;//if fundamental type no init
@@ -16,25 +17,26 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 	}
 	CmatBase& O() {
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) arr_[i][j] = 0;
+		return *this;
 	}
 
 	const std::array<T, H>& operator[](unsigned n) const { return arr_[n]; } 
 	std::array<T, H>& operator[](unsigned n) { return arr_[n]; }//need arr_ public
-	template<unsigned R> CmatBase<T,R,H> operator*(const CmatBase<T,R,W>& r) const {
-		CmatBase<T, R, H> m;
+	template<unsigned R> Cmat<T,R,H> operator*(const CmatBase<T,R,W>& r) const {
+		Cmat<T, R, H> m;
 		m.O();
 		for(int i=0; i<R; i++) for(int j=0; j<H; j++) 
 			for(int k=0; k<W; k++) m[i][j] += (*this)[k][j] * r[i][k];
 		return m;
 	}
-	CmatBase<T, W, H> operator+(const CmatBase<T, W, H>& r) const {
-		CmatBase<T, W, H> m;
+	Cmat<T, W, H> operator+(const CmatBase<T, W, H>& r) const {
+		Cmat<T, W, H> m;
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) 
 			m[i][j] = (*this)[i][j] + r[i][j];
 		return m;
 	}
-	CmatBase<T, W, H> operator-(const CmatBase<T, W, H>& r) const {
-		CmatBase<T, W, H> m;
+	Cmat<T, W, H> operator-(const CmatBase<T, W, H>& r) const {
+		Cmat<T, W, H> m;
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) 
 			m[i][j] = (*this)[i][j] - r[i][j];
 		return m;
@@ -53,28 +55,28 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 	bool operator!=(const CmatBase<T, W, H>& r) const{
 		return !(*this == r);
 	}
-	CmatBase<T, H, W> transpose() const {
-		CmatBase<T, H, W> m;
+	Cmat<T, H, W> transpose() const {
+		Cmat<T, H, W> m;
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) m[j][i] = (*this)[i][j];
 		return m;
 	}
-	CmatBase<T, W, H> operator*(T mul) const {
-		CmatBase<T, W, H> m{*this};
+	Cmat<T, W, H> operator*(T mul) const {
+		Cmat<T, W, H> m{*this};
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) m[i][j] = m[i][j] * mul;
 		return m;
 	}
 	CmatBase<T, W, H>& operator*=(T mul) {
 		return *this = *this * mul;
 	}
-	CmatBase<T, W, H> operator/(T div) const {
-		CmatBase<T, W, H> m{*this};
+	Cmat<T, W, H> operator/(T div) const {
+		Cmat<T, W, H> m{*this};
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) m[i][j] = m[i][j] / div;
 		return m;
 	}
 	CmatBase<T, W, H>& operator/=(T div) {
 		return *this = *this / div;
 	}
-	friend CmatBase<T, W, H> operator*(T mul, const CmatBase<T, W, H>& r) {
+	friend Cmat<T, W, H> operator*(T mul, const CmatBase<T, W, H>& r) {
 		return r * mul;
 	}
 };

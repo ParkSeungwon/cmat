@@ -28,4 +28,7 @@ TEST_CASE("plane test", "[plane]") {
 //	auto n = rx * ry * vec4{0,0,1,1};
 
 //	WARN("normal" << n << p.normal());
+	Cmat<float, 2, 2> c, d;
+	auto e = c - d;
+	WARN(e-c);
 }
