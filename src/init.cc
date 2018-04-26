@@ -44,8 +44,8 @@ void init_globjects()
 	hare.matrix(m.glrotateX(-M_PI/2) * m.glscale(0.6,0.6,0.6));
 
 	auto n = dummy.read_obj_file("dummy_obj.obj");
-//	dummy.colors({n,{1,0,0}});
-	dummy.texture_file("steel.png");
+	dummy.colors({n,{1,0,0,1}});
+//	dummy.texture_file("steel.png");
 	dummy.matrix(m.glscale(0.5,0.5,.5));
 
 	objs += spaceship;

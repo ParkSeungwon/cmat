@@ -13,6 +13,36 @@ void GLObject::vertexes(const vector<vec4>& v) { vertexes_ = v; }
 void GLObject::vertexes(vector<vec4>&& v) { vertexes_ = move(v); }
 void GLObject::colors(const vector<vec4>& v) { colors_ = v; }
 void GLObject::colors(vector<vec4>&& v) { colors_ = move(v); }
+void GLObject::colors()
+{//color from texture, change to fit to texture u,v position
+	if(texture_file_ == "") return;
+	colors_.clear();
+	for(int i=0; i<normals_.size(); i++) {
+		float x = normals_[i][0][0];
+		float y = normals_[i][0][1];
+		float z = normals_[i][0][2];//find biggest abs->vertex coord
+		float vx = vertexes_[i][0][0];
+		float vy = vertexes_[i][0][1];
+		float vz = vertexes_[i][0][2];
+
+//		if(abs(x) > abs(y) && abs(x) > abs(z)) colors_.push_back({x>0?1:-1, vy, vz});
+//		else if(abs(y)>abs(z) && abs(y)>abs(x)) colors_.push_back({vx, y>0?1:-1, vz});
+//		else colors_.push_back({vx, vy, z>0?1:-1});
+
+		if(abs(x) > abs(y) && abs(x) > abs(z)) //map to 육면체 전개도 
+			colors_.push_back({x > 0 ? 0.5 + (1 - vz) / 8 : (vz + 1) / 8, 
+					1.0f / 3 + (vy + 1) / 6, 0});
+		else if(abs(y)>abs(z) && abs(y)>abs(x)) 
+			colors_.push_back({0.25 + (vx + 1) / 8, 
+					y > 0 ? (vz + 1) / 6 : 2.0f / 3 + (1 - vz) / 6, 0});
+		else colors_.push_back({z > 0 ? 0.25 + (vx + 1) / 8 : 0.75 + (1 - vx) / 8,
+				1.0f / 3 + (vy + 1) / 6, 0});
+	}
+
+	cout << "colors_ size : " << colors_.size() << endl;
+	for(auto& a : colors_) for(int i=0; i<3; i++) 
+		assert(a[0][i] >= -1 && a[0][i] <= 1);
+}
 void GLObject::indices(const vector<unsigned>& v) { indices_ = v; }
 void GLObject::indices(vector<unsigned>&& v) { indices_ = move(v); }
 void GLObject::texture_file(string f) { texture_file_ = f; }
@@ -65,40 +95,40 @@ unsigned GLObject::read_obj_file(string file)
 		}
 	}
 	cout << file << "\'s indices size : " << indices_.size() << endl;
+	normalize_vertex();
 	return vertexes_.size();
 }	
 
-
-void GLObject::colors()
-{//change to fit to texture u,v position
-	if(texture_file_ == "") return;
-	colors_.clear();
-	normalize_vertex();
-	for(int i=0; i<normals_.size(); i++) {
-		float x = normals_[i][0][0];
-		float y = normals_[i][0][1];
-		float z = normals_[i][0][2];//find biggest abs->vertex coord
-		float vx = vertexes_[i][0][0];
-		float vy = vertexes_[i][0][1];
-		float vz = vertexes_[i][0][2];
-
-//		if(abs(x) > abs(y) && abs(x) > abs(z)) colors_.push_back({x>0?1:-1, vy, vz});
-//		else if(abs(y)>abs(z) && abs(y)>abs(x)) colors_.push_back({vx, y>0?1:-1, vz});
-//		else colors_.push_back({vx, vy, z>0?1:-1});
-
-		if(abs(x) > abs(y) && abs(x) > abs(z)) //map to 육면체 전개도 
-			colors_.push_back({x > 0 ? 0.5 + (1 - vz) / 8 : (vz + 1) / 8, 
-					1.0f / 3 + (vy + 1) / 6, 0});
-		else if(abs(y)>abs(z) && abs(y)>abs(x)) 
-			colors_.push_back({0.25 + (vx + 1) / 8, 
-					y > 0 ? (vz + 1) / 6 : 2.0f / 3 + (1 - vz) / 6, 0});
-		else colors_.push_back({z > 0 ? 0.25 + (vx + 1) / 8 : 0.75 + (1 - vx) / 8,
-				1.0f / 3 + (vy + 1) / 6, 0});
+unsigned GLObject::read_objmtl(string file)
+{
+	int face = 0;
+	string s;
+	ifstream f(file);
+	while(getline(f, s)) {
+		stringstream ss{s};
+		ss >> s;
+		if(s == "v") {
+			float x,  y, z;
+			ss >> x >> y >> z;
+			vertexes_.push_back(vec4{x, y, z, 1});
+		} else if(s == "f") {
+			while(getline(ss, s, '/')) {
+				indices_.push_back(stoi(s)-1);
+				getline(ss, s, ' ');
+				face++;
+			}
+			if(face == 3) mode(GL_TRIANGLES);
+			else if(face == 4) mode(GL_QUADS);
+		} else if(s == "vn") {
+			float x, y, z;
+			ss >> x >> y >> z;
+			normals_.push_back(vec4{x, y, z, 1});
+		} else if(s == "vt") {
+		}			
 	}
-
-	cout << "colors_ size : " << colors_.size() << endl;
-	for(auto& a : colors_) for(int i=0; i<3; i++) 
-		assert(a[0][i] >= -1 && a[0][i] <= 1);
+	cout << file << "\'s indices size : " << indices_.size() << endl;
+	normalize_vertex();
+	return vertexes_.size();
 }
 
 void GLObject::normalize_vertex()

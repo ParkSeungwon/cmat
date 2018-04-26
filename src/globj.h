@@ -12,6 +12,7 @@ class GLObject
 public:
 	GLObject();
 	unsigned read_obj_file(std::string filename);
+	unsigned read_objmtl(std::string filename);
 
 	//setters
 	void mode(GLenum md);
