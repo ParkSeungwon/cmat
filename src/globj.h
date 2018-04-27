@@ -26,8 +26,6 @@ public:
 	void texture_file(std::string filename);
 
 protected:
-	void normals();
-	void colors();//for texture mapping if filename is specified
 	std::vector<vec4> vertexes_, colors_, normals_;
 	std::vector<unsigned> indices_;
 	mat4 matrix_, light_;
@@ -36,6 +34,8 @@ protected:
 	friend class GLObjs;
 
 private:
+	void calc_colors_from_texture();//for texture mapping if filename is specified
+	void calc_normals();
 	void normalize_vertex();
 	static std::array<int, 3> parse_f(std::string numberNslash);
 };

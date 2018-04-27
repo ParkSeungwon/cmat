@@ -73,8 +73,8 @@ GLObjs& GLObjs::operator+=(GLObject& r)
 {
 	if(r.indices_.empty()) for(int i=0; i<r.vertexes_.size(); i++) //if no indices
 		r.indices_.push_back(i);
-	r.normals();
-	r.colors();//if texture, normalize vertex
+	if(r.normals_.empty()) r.calc_normals();
+	r.calc_colors_from_texture();//if texture, normalize vertex
 //	for(int i=0; i<10; i++) cout << r.vertexes_[i] << r.colors_[i] << r.normals_[i];
 	auto sz = vertexes_.size();
 	vertexes_.insert(vertexes_.end(), r.vertexes_.begin(), r.vertexes_.end());
