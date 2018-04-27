@@ -105,6 +105,7 @@ unsigned GLObject::read_objmtl(string file)
 	map<string, MTL> nameNmtl;
 	vector<vec3> xyz, uv, normals;
 	vector<unsigned> indices;
+	map<string, cv::Mat> texture;
 	MTL mtl;
 	int face = 0;
 	string s;
@@ -115,6 +116,9 @@ unsigned GLObject::read_objmtl(string file)
 		if(s == "mtllib") {
 			ss >> s;
 			nameNmtl = read_mtl(s);
+			for(auto a : nameNmtl) for(auto b : a.second.map_K)
+				if(b != "" && texture.find(b) == texture.end()) 
+					texture[b] = cv::imread(b);
 		} else if(s == "usemtl") {
 			ss >> s;
 			mtl = nameNmtl[s];
@@ -127,9 +131,26 @@ unsigned GLObject::read_objmtl(string file)
 				face++;
 				auto ix = parse_f(s);
 				vertexes_.push_back(xyz[ix[0] - 1].add_tail());
-				if(ix[1]) colors_.push_back(uv[ix[1] - 1].add_tail());
-				else colors_.push_back((mtl.Ka + mtl.Kd + mtl.Ks + mtl.Ke).add_tail());
 				if(ix[2]) normals_.push_back(normals[ix[2] - 1].add_tail());
+				if(ix[1]) {
+					vec3 color; color.O();
+					float x = uv[ix[1] - 1][0][0];
+					float y = uv[ix[1] - 1][0][1];
+					for(int i=0; i<4; i++) {
+						if(mtl.map_K[i] != "") {
+							x *= texture[mtl.map_K[i]].cols;
+							y *= texture[mtl.map_K[i]].rows;
+							auto v3 = texture[mtl.map_K[i]].at<cv::Vec3b>(y, x);
+							vec3 rgb = {v3[2] / 255.f * mtl.K[i][0][0], 
+										v3[1] / 255.f * mtl.K[i][0][1],
+										v3[0] / 255.f * mtl.K[i][0][2]};
+							color += rgb;
+						} else color += mtl.K[i];
+					}
+					colors_.push_back(color.add_tail());
+				} else colors_.push_back(
+						(mtl.K[0] + mtl.K[1] + mtl.K[2] + mtl.K[3]).add_tail()
+						);
 			}
 
 			if(face == 3) mode(GL_TRIANGLES);
@@ -144,6 +165,7 @@ unsigned GLObject::read_objmtl(string file)
 			uv.push_back({u, v, 0});
 		}
 	}
+	for(int i=0; i<vertexes_.size(); i++) indices_.push_back(i+1);
 	cout << file << "\'s indices size : " << indices_.size() << endl;
 	normalize_vertex();
 	return vertexes_.size();

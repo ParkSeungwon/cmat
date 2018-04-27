@@ -4,6 +4,7 @@
 #include"vec.h"
 #include"4x4.h"
 #include"plane.h"
+#include"mtl.h"
 using namespace std::chrono;
 using namespace std;
 using mat4 = Cmat<float, 4, 4>;
@@ -38,4 +39,10 @@ TEST_CASE("plane test", "[plane]") {
 TEST_CASE("array init") {
 	array<int ,3> ar;
 	for(int i=0; i<3; i++) REQUIRE(ar[i] == 0);
+	int k = 3;
+	REQUIRE(k / 1.5f == 2);
+}
+
+TEST_CASE("read_mtl") {
+	auto sNm = read_mtl("Handgun_obj.mtl");
 }
