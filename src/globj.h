@@ -30,13 +30,14 @@ protected:
 	void colors();//for texture mapping if filename is specified
 	std::vector<vec4> vertexes_, colors_, normals_;
 	std::vector<unsigned> indices_;
-	mat4 matrix_;
+	mat4 matrix_, light_;
 	GLenum mode_ = GL_TRIANGLES;
 	std::string texture_file_;
 	friend class GLObjs;
 
 private:
 	void normalize_vertex();
+	static std::array<int, 3> parse_f(std::string numberNslash);
 };
 
 class GLObjs : protected GLObject

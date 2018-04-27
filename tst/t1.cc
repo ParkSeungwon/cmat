@@ -1,9 +1,11 @@
 #include<catch.hpp>
 #include<chrono>
+#include<array>
 #include"vec.h"
 #include"4x4.h"
 #include"plane.h"
 using namespace std::chrono;
+using namespace std;
 using mat4 = Cmat<float, 4, 4>;
 using vec4 = Cmat<float, 1, 4>;
 
@@ -31,4 +33,9 @@ TEST_CASE("plane test", "[plane]") {
 	Cmat<float, 2, 2> c, d;
 	auto e = c - d;
 	WARN(e-c);
+}
+
+TEST_CASE("array init") {
+	array<int ,3> ar;
+	for(int i=0; i<3; i++) REQUIRE(ar[i] == 0);
 }

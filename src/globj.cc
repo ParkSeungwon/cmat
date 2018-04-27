@@ -3,6 +3,7 @@
 #include<highgui.h>
 #include<iostream>
 #include"globj.h"
+#include"mtl.h"
 using namespace std;
 
 GLObject::GLObject() { matrix_.E(); }
@@ -101,34 +102,62 @@ unsigned GLObject::read_obj_file(string file)
 
 unsigned GLObject::read_objmtl(string file)
 {
+	map<string, MTL> nameNmtl;
+	vector<vec3> xyz, uv, normals;
+	vector<unsigned> indices;
+	MTL mtl;
 	int face = 0;
 	string s;
 	ifstream f(file);
 	while(getline(f, s)) {
 		stringstream ss{s};
 		ss >> s;
-		if(s == "v") {
+		if(s == "mtllib") {
+			ss >> s;
+			nameNmtl = read_mtl(s);
+		} else if(s == "usemtl") {
+			ss >> s;
+			mtl = nameNmtl[s];
+		} else if(s == "v") {
 			float x,  y, z;
 			ss >> x >> y >> z;
-			vertexes_.push_back(vec4{x, y, z, 1});
+			xyz.push_back({x, y, z});
 		} else if(s == "f") {
-			while(getline(ss, s, '/')) {
-				indices_.push_back(stoi(s)-1);
-				getline(ss, s, ' ');
+			while(ss >> s) {
 				face++;
+				auto ix = parse_f(s);
+				vertexes_.push_back(xyz[ix[0] - 1].add_tail());
+				if(ix[1]) colors_.push_back(uv[ix[1] - 1].add_tail());
+				else colors_.push_back((mtl.Ka + mtl.Kd + mtl.Ks + mtl.Ke).add_tail());
+				if(ix[2]) normals_.push_back(normals[ix[2] - 1].add_tail());
 			}
+
 			if(face == 3) mode(GL_TRIANGLES);
 			else if(face == 4) mode(GL_QUADS);
 		} else if(s == "vn") {
 			float x, y, z;
 			ss >> x >> y >> z;
-			normals_.push_back(vec4{x, y, z, 1});
+			normals.push_back({x, y, z});
 		} else if(s == "vt") {
-		}			
+			float u, v;
+			ss >> u >> v;
+			uv.push_back({u, v, 0});
+		}
 	}
 	cout << file << "\'s indices size : " << indices_.size() << endl;
 	normalize_vertex();
 	return vertexes_.size();
+}
+
+array<int, 3> GLObject::parse_f(string s)
+{
+	array<int, 3> r;
+	int i = 0;
+	for(char c : s) {
+		if(c == '/') i++;
+		else r[i] = r[i] * 10 + (c - '0');
+	}
+	return r;
 }
 
 void GLObject::normalize_vertex()
