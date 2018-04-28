@@ -46,7 +46,7 @@ void generate_enemy()
 	while(!end_game) {//initial x,y,z position
 		pos[0][0] = di(rd); 
 		pos[0][1] = di(rd); 
-		pos[0][2] = -14; 
+		pos[0][2] = -20; 
 		pos[0][3] = di2(rd);//enemy type
 		enemies.push_back(pos);
 		lock.lock();

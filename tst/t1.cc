@@ -45,4 +45,14 @@ TEST_CASE("array init") {
 
 TEST_CASE("read_mtl") {
 	auto sNm = read_mtl("Handgun_obj.mtl");
+	string s = "2/23/3";
+	array<int, 3> r;
+	int i = 0;
+	for(char c : s) {
+		if(c == '/') i++;
+		else r[i] = r[i] * 10 + (c - '0');
+	}
+	REQUIRE(r[0] == 2);
+	REQUIRE(r[1] == 23);
+	REQUIRE(r[2] == 3);
 }

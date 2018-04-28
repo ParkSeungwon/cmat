@@ -22,7 +22,7 @@ void init_globjects()
 	background.vertexes(v);
 	background.texture_file("1.jpg");
 	background.indices({0,1,2,3, 7,6,5,4, 4,5,1,0, 5,6,2,1, 6,7,3,2, 7,4,0,3});
-	background.matrix(m.gltranslate(0,0,-9.9) * m.glscale(1,1,5));
+	background.matrix(m.gltranslate(-1,-1,-20) * m.glscale(2,2,40));
 	background.mode(GL_QUADS);
 
 	monkey.read_obj_file("monkey.obj");
@@ -39,9 +39,12 @@ void init_globjects()
 	missile.texture_file("steel.png");
 	missile.matrix(m.glscale(.5,.5,.5));
 
-	hare.read_obj_file("hare.obj");
-	hare.texture_file("marble.jpg");
-	hare.matrix(m.glrotateX(-M_PI/2) * m.glscale(0.6,0.6,0.6));
+	hare.read_objmtl("Handgun_obj.obj");
+//	hare.matrix(m.glscale(.5, .5, .5));
+
+//	hare.read_obj_file("hare.obj");
+//	hare.texture_file("marble.jpg");
+//	hare.matrix(m.glrotateX(-M_PI/2) * m.glscale(0.6,0.6,0.6));
 
 	auto n = dummy.read_obj_file("dummy_obj.obj");
 	dummy.colors({n,{1,0,0,1}});
@@ -51,10 +54,10 @@ void init_globjects()
 	objs += spaceship;
 	objs += background;
 	objs += ironman;
-	objs += missile;
 	objs += monkey;
 	objs += hare;
 	objs += dummy;
+	objs += missile;
 	objs += projectile;
 	objs.transfer_all();
 }
