@@ -255,12 +255,12 @@ void GLObjs::load_alphabet()
 	mat4 m;
 	for(c[0]='A'; i<26; c[0]++, i++) {
 		unsigned n = alphabet[i].read_obj_file(c);
-		alphabet[i].colors({n, {0,1,1}});
+		alphabet[i].colors({n, {0,1,1,0.2}});
 		alphabet[i].matrix(m.glrotateX(-0.5 * M_PI));
 	}
 	for(c[0]='0'; i<36; c[0]++, i++) {
 		unsigned n = alphabet[i].read_obj_file(c);
-		alphabet[i].colors({n, {0,1,0}});
+		alphabet[i].colors({n, {0,1,0,0.2}});
 	}
 	for(i=0; i<36; i++) *this += alphabet[i];
 }

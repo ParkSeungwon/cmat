@@ -1,5 +1,8 @@
 45*
 *.zip
+*.png
+*.mtl
+*.ogg
 *.x
 *.tx
 *.t

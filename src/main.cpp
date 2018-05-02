@@ -2,6 +2,7 @@
 #include<thread>
 #include<iostream>
 #include<mutex>
+#include<SFML/Audio.hpp>
 #include<random>
 #include<complex>
 #include"projectile.h"
@@ -75,6 +76,10 @@ void detect_crash()
 
 int main()
 {
+	sf::Music music;
+	if(!music.openFromFile("J.ogg")) return -1;
+	music.play();
+
 	TextPlane tp;
 	if (!glfwInit()) return -1;
 	GLFWwindow* window = glfwCreateWindow(1024, 1024, "Space War", NULL, NULL);

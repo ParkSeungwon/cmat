@@ -95,7 +95,7 @@ unsigned GLObject::read_obj_file(string file)
 			normals_.push_back(vec4{x, y, z, 1});
 		}
 	}
-	cout << file << "\'s indices size : " << indices_.size() << endl;
+	cout << file << "'s indices size : " << indices_.size() << endl;
 	normalize_vertex();
 	return vertexes_.size();
 }	
@@ -157,7 +157,7 @@ unsigned GLObject::read_objmtl(string file)
 		}
 	}
 	for(int i=0; i<vertexes_.size(); i++) indices_.push_back(i+1);
-	cout << file << "\'s indices size : " << indices_.size() << endl;
+	cout << file << "'s indices size : " << indices_.size() << endl;
 	normalize_vertex();
 	return vertexes_.size();
 }

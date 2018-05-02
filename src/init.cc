@@ -39,8 +39,8 @@ void init_globjects()
 	missile.texture_file("steel.png");
 	missile.matrix(m.glscale(.5,.5,.5));
 
-	hare.read_objmtl("Handgun_obj.obj");
-//	hare.matrix(m.glscale(.5, .5, .5));
+	hare.read_objmtl("CobbleStones.obj");
+//	hare.matrix(m.gltranslate(1,0,0) * m.glscale(2, 2, 2));
 
 //	hare.read_obj_file("hare.obj");
 //	hare.texture_file("marble.jpg");
