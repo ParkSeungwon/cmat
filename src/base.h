@@ -4,6 +4,8 @@
 #include<iomanip>
 #include<cassert>
 #include<cmath>
+#include<type_traits>
+#include<cxcore.h>
 
 template<class T, unsigned W, unsigned H> struct Cmat;
 template<class T, unsigned W, unsigned H> struct CmatBase
@@ -15,6 +17,19 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 		auto it = li.begin();
 		for(int j=0; j<H; j++) for(int i=0; i<W; i++) (*this)[i][j] = *it++;
 	}
+	CmatBase(cv::Mat r) {
+		assert(W == r.cols && H == r.rows);
+		assert((std::is_same<T, std::array<unsigned, 3>>::value));
+		for(int i=0; i<W; i++) for(int j=0; j<H; j++) for(int k=0; k<3; k++)
+			(*this)[i][j][k] = r.at<cv::Vec3b>(j, i)[2 - k];
+	}
+	operator cv::Mat() {
+		cv::Mat r{H, W, CV_8UC3};
+		for(int i=0; i<W; i++) for(int j=0; j<H; j++) for(int k=0; k<3; k++)
+			r.at<cv::Vec3b>(j, i)[2 - k] = (*this)[i][j][k];
+		return r;
+	}
+
 	CmatBase& O() {
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) arr_[i][j] = 0;
 		return *this;

@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include<highgui.h>
+#include"base.h"
 using namespace std;
 using namespace cv;
 
@@ -11,6 +12,11 @@ int main(int ac, char** av)
 		return 0;
 	}
 	Mat m = imread(av[1]);
+	Cmat<array<unsigned, 3>, 1200, 630> cmat{m};
+	for(int i=0; i<630; i++) cmat[i][i][2] = 255;
+//	Mat m2{Cmat<array<unsigned, 3>, 300, 300>()};
+	Mat m2{cmat};
+	for(int i=0; i<3; i++) cout << cmat[300][300][i] << ',';
 	cout << m.cols << 'x' << m.rows << endl << "channel : " << m.channels() << endl;
 	string s;
 	switch(m.depth()) {
@@ -23,7 +29,7 @@ int main(int ac, char** av)
 		case CV_64F: s = "64F"; break;
 	}
 	cout << "depth : " << s << endl;
-	imshow(av[1], m);
+	imshow(av[1], m2);
 	waitKey(0);
 }
 	
