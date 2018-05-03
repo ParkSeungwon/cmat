@@ -56,3 +56,4 @@ TEST_CASE("read_mtl") {
 	REQUIRE(r[1] == 23);
 	REQUIRE(r[2] == 3);
 }
+

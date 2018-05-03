@@ -2,6 +2,7 @@
 #include<string>
 #include<highgui.h>
 #include"base.h"
+#include"blender-32x32.xpm"
 using namespace std;
 using namespace cv;
 
@@ -30,6 +31,7 @@ int main(int ac, char** av)
 	}
 	cout << "depth : " << s << endl;
 	imshow(av[1], m2);
+	CmatXpm<xpm[0]> cmm{xpm};
 	waitKey(0);
 }
 	
