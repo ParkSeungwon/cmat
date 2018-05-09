@@ -1,12 +1,13 @@
 #pragma once
 #include<random>
 #include<functional>
+#include<fstream>
 #include<algorithm>
 #include"base.h"
 
 template<unsigned Idx, unsigned W, unsigned H> class Weight {
 protected:
-	Cmat<float, W, H> mat;
+	Cmat<float, W+1, H> mat;//+1 = bias
 };
 template<unsigned Idx, unsigned H> class Layer {
 protected:
@@ -72,14 +73,45 @@ public:
 		update_weight(alpha);
 		return 0.5 * err;
 	}
-
+	void save_weights(std::string filename) {
+		std::ofstream f(filename);
+		save_weights(f);
+	}
+	void load_weights(std::string filename) {
+		std::ifstream f(filename);
+		load_weights(f);
+	}
 private:
 	std::random_device rd_;
 	std::function<float(float)> transfer_function_
 		= [](float x) {return 1 / (1 + exp(-x));};//sigmoid default
+	template<unsigned Idx = 0> void save_weights(std::ostream& o) {
+		if constexpr(Idx < sizeof...(Ns) - 1) {
+			o << weight<Idx>(*this) << std::endl;
+			save_weights<Idx + 1>(o);
+		}
+	}
+	template<unsigned Idx = 0> void load_weights(std::istream& is) {
+		if constexpr(Idx < sizeof...(Ns) - 1) {
+			std::string s; float f;
+			auto& w = weight<Idx>(*this);
+			for(int j=0; j<w.height_; j++) {
+				is >> s;
+				for(int i=0; i<w.width_; i++) is >> w[i][j];
+				is >> s;
+			}
+			load_weights<Idx + 1>(is);
+		}
+	}
+	template<unsigned H> static auto add_bias(Cmat<float, 1, H> m) {
+		Cmat<float, 1, H+1> r;
+		for(int i=0; i<H; i++) r[0][i] = m[0][i];
+		r[0][H] = 1;
+		return r;
+	}
 	template<unsigned Idx = 0> void feed_forward() {
 		if constexpr(Idx < sizeof...(Ns) - 1) {
-			layer<Idx + 1>(*this) = weight<Idx>(*this) * layer<Idx>(*this);
+			layer<Idx + 1>(*this) = weight<Idx>(*this) * add_bias(layer<Idx>(*this));
 			float* p = reinterpret_cast<float*>(layer<Idx + 1>(*this).arr_.data());
 			transform(p, p + layer<Idx + 1>(*this).height_, p, transfer_function_);
 			feed_forward<Idx + 1>();
