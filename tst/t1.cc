@@ -1,6 +1,7 @@
 #include<catch.hpp>
 #include<chrono>
 #include<array>
+#include<iostream>
 #include"vec.h"
 #include"4x4.h"
 #include"plane.h"
@@ -55,5 +56,18 @@ TEST_CASE("read_mtl") {
 	REQUIRE(r[0] == 2);
 	REQUIRE(r[1] == 23);
 	REQUIRE(r[2] == 3);
+}
+
+template<const char* T> struct A {
+	A() {
+		cout << T << endl;
+	}
+};
+
+constexpr char p[] = "hello";
+TEST_CASE("const char") {
+	//A<"hello"> a;
+	A<p> b;
+	cout << "hello2" << endl;
 }
 

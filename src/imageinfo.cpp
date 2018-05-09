@@ -31,7 +31,7 @@ int main(int ac, char** av)
 	}
 	cout << "depth : " << s << endl;
 	imshow(av[1], m2);
-	CmatXpm<xpm[0]> cmm{xpm};
+	//CmatXpm<"34 23 324"> cmm{xpm};
 	waitKey(0);
 }
 	
