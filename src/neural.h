@@ -44,15 +44,30 @@ template<unsigned Idx, unsigned... Ns> auto& delta(Neural<Idx, Ns...>& r) {
 
 template<unsigned... Ns> class NeuralNet : public Neural<0, Ns...> {
 public:
-	template<class Di, unsigned Idx = 0> void init(Di di) {
-		auto& a = weight<Idx>(*this);
-		for(int i=0; i<a.width_; i++) for(int j=0; j<a.height_; j++) 
-			a[i][j] = di(rd_);
-		init<Di, Idx + 1>(di);
+	template<class Di, unsigned Idx = 0> void init(Di di) {//di = random distribution
+		if constexpr(Idx < sizeof...(Ns) - 1) {
+			auto& a = weight<Idx>(*this);
+			for(int i=0; i<a.width_; i++) for(int j=0; j<a.height_; j++) 
+				a[i][j] = di(rd_);
+			init<Di, Idx + 1>(di);
+		}
+	}
+	auto feed_forward(std::vector<float> v) {
+		for(int i=0; i<v.size(); i++) layer<0>(*this)[0][i] = v[i];
+		forward_feed();
+		return layer<sizeof...(Ns) - 1>(*this);
 	}
 
 private:
 	std::random_device rd_;
-	template<class Di>  void init<Di, sizeof...(Ns) - 1>(Di di) {}
+	std::function<float(float)> transfer = [](float x) {return 1 / (1 + exp(-x));};
+	template<unsigned Idx = 0> void forward_feed() {
+		if constexpr(Idx < sizeof...(Ns) - 1) {
+			auto a = weight<Idx>(*this) * layer<Idx>(*this);
+			for(int i=0; i<a.height_; i++) a[0][i] = transfer(a[0][i]);
+			layer<Idx + 1>(*this) = a;
+			forward_feed<Idx + 1>();
+		}
+	}
 };
 
