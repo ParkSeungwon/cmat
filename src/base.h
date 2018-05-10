@@ -20,9 +20,8 @@ template<class T, unsigned W, unsigned H> struct Cmat;
 template<class T, unsigned W, unsigned H> struct CmatBase
 {//compile time matrix base class
 	std::array<std::array<T, H>, W> arr_;//if fundamental type no init
-	const int width_ = W;
-	const int height_ = H;
-	using type = T;
+	int width_ = W;
+	int height_ = H;
 	CmatBase() = default;
 	CmatBase(std::initializer_list<T> li) {
 		//assert(li.size() == W * H);
@@ -114,14 +113,6 @@ template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>
 	Cmat(std::initializer_list<T> li) : CmatBase<T,W,H>{li} {}
 	Cmat(CmatBase<T, W, H> r) { this->arr_ = r.arr_; }
 	Cmat(const Cmat<T, W, H>& r) = default;
-	Cmat<T, W, H>& operator=(Cmat<T, W, H>&& r) {
-		this->arr_ = move(r.arr_);
-		return *this;
-	}
-	Cmat<T, W, H>& operator=(const Cmat<T, W, H>& r) {
-		this->arr_ = r.arr_;
-		return *this;
-	}
 };
 
 template<const char* X> struct CmatXpm

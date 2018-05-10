@@ -108,8 +108,8 @@ unsigned make_shader_program(string v_shader, string f_shader)
 {
 	auto* vp = v_shader.data();
 	auto* fp = f_shader.data();
-	const char** vertex_shader = &vp;
-	const char** fragment_shader = &fp;
+	char** vertex_shader = &vp;
+	char** fragment_shader = &fp;
 
 	unsigned vs = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vs, 1, vertex_shader, NULL);
