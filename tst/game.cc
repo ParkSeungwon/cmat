@@ -3,14 +3,25 @@
 #include"game/game.h"
 using namespace std;
 
-TEST_CASE("game") {
+//TEST_CASE("game") {
+//	Board board;
+//	cout << endl << board << endl;
+//	while(board.find_match()) {
+//		board.transform();
+//		cout << board << endl;
+//		board.drop();
+//		cout << board << endl;
+//	}
+//}
+
+TEST_CASE("game2") {
 	Board board;
-	cout << endl << board.board_ << endl;
+	cout << endl << board << endl;
 	while(board.find_match()) {
 		board.transform();
-		cout << board.board_ << endl;
-		board.drop();
-		cout << board.board_ << endl;
+		cout << board << endl;
+		while(board.step_drop()) cout << board << endl;
+		board.turn_finish();
 	}
 }
 

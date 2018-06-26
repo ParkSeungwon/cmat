@@ -6,8 +6,8 @@ bool Block::operator==(const Block& r) const
 	return color == r.color;
 }
 
-uniform_int_distribution<int> Block::di{0,4};
-random_device Block::rd;
+static uniform_int_distribution<int> di{0,4};
+static random_device rd;
 
 Block::Block()
 {
@@ -34,7 +34,18 @@ ostream& operator<<(ostream& o, const Block& b)
 	return o;
 }
 
+ostream& operator<<(ostream& o, const Board& b)
+{
+	o << b.board_;
+	return o;
+}
+
 Board::Board()
+{
+	turn_finish();
+}
+
+void Board::turn_finish()
 {
 	for(int i=0, k=0; i<BOARD_SZ; i++, k=0) for(int j=0; j<BOARD_SZ-1; j++) 
 		board_[i][j].x = i, board_[i][j].y = j;
@@ -101,22 +112,33 @@ void Board::transform()
 	}
 }
 
-void Board::drop()
+bool Board::step_drop()
 {
+	bool blank = false;
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
-		if(board_[i][j].level == Block::Level::DELETE) 
-			board_[i][j] = get_below(i, j+1);
-	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
-		board_[i][j].x = i, board_[i][j].y = j;
+		if(board_[i][j].level == Block::Level::DELETE) {
+			for(int k=j; k<BOARD_SZ-1; k++) board_[i][k] = board_[i][k+1];
+			board_[i][BOARD_SZ-1] = Block{};
+			blank = true;
+			break;
+		}
+	return blank;
 }
 
-Block Board::get_below(int x, int y)
-{
-	if(y == BOARD_SZ) return Block{};
-	if(board_[x][y].level == Block::Level::DELETE) return get_below(x, y+1);
-	else {
-		auto b = board_[x][y];
-		board_[x][y].level = Block::Level::DELETE;
-		return b;
-	}
-}
+//Block Board::get_below(int x, int y)
+//{
+//	if(y == BOARD_SZ) return Block{};
+//	if(board_[x][y].level == Block::Level::DELETE) return get_below(x, y+1);
+//	else {
+//		auto b = board_[x][y];
+//		board_[x][y].level = Block::Level::DELETE;
+//		return b;
+//	}
+//}
+//void Board::drop()
+//{
+//	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
+//		if(board_[i][j].level == Block::Level::DELETE)
+//			board_[i][j] = get_below(i, j+1), board_[i][j].x = i, board_[i][j].y = j;
+//}
+//
