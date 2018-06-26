@@ -1,9 +1,7 @@
-#include"neural.h"
-#include"plot.h"
 #include<algorithm>
 #include<iostream>
-#define TEST_SET 100
-#define TRAIN_SET 1000
+#include"plot.h"
+#include"neural.h"
 using namespace std;
 float relu(float x) {
 	if(x > 0 ) return x;
@@ -30,9 +28,19 @@ array<Cmat<unsigned char, 28, 28>, N> read_image(string filename) {
 	return r;
 }
 
+template<unsigned N> auto pool(Cmat<unsigned char, N, N> m) {
+	static_assert(N % 2 == 0);
+	Cmat<unsigned char, N/2, N/2> r;
+	for(int i=0; i<N; i+=2) for(int j=0; j<N; j+=2) 
+		r[i/2][j/2] = max(max(m[i][j], m[i][j+1]), max(m[i+1][j], m[i+1][j+1]));
+	return r;
+}
+
 int main()
 {
-	NeuralNet<28*28, 300, 100, 20, 10> net;
+	const int TRAIN_SET =  1000;
+	const int TEST_SET = 100;
+	NeuralNet<7*7, 30, 20, 10> net;
 	auto label = read_label<TRAIN_SET>("train-label.dat");
 	auto image = read_image<TRAIN_SET>("train-image.dat");
 	auto tlabel = read_label<TEST_SET>("test-label.dat");
@@ -40,16 +48,18 @@ int main()
 	for(auto a : tlabel) cout << +a;
 	uniform_real_distribution<float> di{0, 1};
 	net.init(di);
+//	net.transfer_function(relu);
 	vector<float> err;
 	for(int k=0; k<10; k++) {
 		float sum = 0;
 		for(int k=0; k<TRAIN_SET; k++) {
-			vector<float> v(28*28), d(10);
-			for(int i=0; i<28; i++) for(int j=0; j<28; j++) 
-				v[j + 28 * i] = image[k][j][i] / 255.;
+			auto a = pool(pool(image[k]));
+			vector<float> v(7*7), d(10);
+			for(int i=0; i<7; i++) for(int j=0; j<7; j++) 
+				v[j + 7 * i] = a[j][i] / 255.;
 			for(int i=0; i<10; i++) d[i] = label[k] == i ? 1 : 0;
 			net.feed_forward(v);
-			sum += net.back_propagation(d, 1);
+			sum += net.back_propagation(d, .1);
 		}
 		err.push_back(sum/TRAIN_SET);
 		cout << k << " epoch : ";
@@ -57,11 +67,14 @@ int main()
 
 		int correct = 0;
 		for(int k=0; k<TEST_SET; k++) {
-			vector<float> v(28*28);
-			for(int i=0; i<28; i++) for(int j=0; j<28; j++)
-				v[j + 28 * i] = timage[k][j][i] / 255.;
+			auto a = pool(pool(timage[k]));
+			vector<float> v(7*7);
+			for(int i=0; i<7; i++) for(int j=0; j<7; j++)
+				v[j + 7 * i] = a[j][i] / 255.;
 			auto result = net.feed_forward(v);
-			if(std::max_element(result.arr_[0].data(), result.arr_[0].data() + 10) - result.arr_[0].data() == tlabel[k]) correct++;
+			int n = std::max_element(result.arr_[0].begin(), result.arr_[0].end()) - result.arr_[0].begin();
+			cout << n << ' ';
+			if(n == tlabel[k]) correct++;
 		}
 		cout << correct << " correct" << endl;
 	}

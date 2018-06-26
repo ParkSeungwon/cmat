@@ -2,6 +2,7 @@ all :
 	make -C gtk/
 	make -C src/
 	make -C tst/
+	make -C game/
 	make -C obj/
 	./catch.x
 

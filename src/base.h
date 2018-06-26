@@ -20,8 +20,6 @@ template<class T, unsigned W, unsigned H> struct Cmat;
 template<class T, unsigned W, unsigned H> struct CmatBase
 {//compile time matrix base class
 	std::array<std::array<T, H>, W> arr_;//if fundamental type no init
-	int width_ = W;
-	int height_ = H;
 	CmatBase() = default;
 	CmatBase(std::initializer_list<T> li) {
 		//assert(li.size() == W * H);
@@ -34,6 +32,8 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) for(int k=0; k<3; k++)
 			(*this)[i][j][k] = r.at<cv::Vec3b>(j, i)[2 - k];
 	}
+	int width() const { return width_; }
+	int height() const { return height_; }
 	operator cv::Mat() {
 		cv::Mat r{H, W, CV_8UC3};
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) for(int k=0; k<3; k++)
@@ -105,6 +105,9 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 	friend Cmat<T, W, H> operator*(T mul, const CmatBase<T, W, H>& r) {
 		return r * mul;
 	}
+private:
+	int width_ = W;
+	int height_ = H;
 };
 
 template<class T, unsigned W, unsigned H> struct Cmat : public CmatBase<T,W,H>
