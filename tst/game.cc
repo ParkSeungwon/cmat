@@ -5,9 +5,12 @@ using namespace std;
 
 TEST_CASE("game") {
 	Board board;
-	board.find_match();
 	cout << endl << board.board_ << endl;
-	board.delete_phase();
-	cout << endl << board.board_ << endl;
+	while(board.find_match()) {
+		board.transform();
+		cout << board.board_ << endl;
+		board.drop();
+		cout << board.board_ << endl;
+	}
 }
 
