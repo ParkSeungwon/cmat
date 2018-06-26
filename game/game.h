@@ -21,6 +21,7 @@ std::ostream& operator<<(std::ostream& o, const Block& b);
 class Board
 {
 public:
+	Board();
 	Cmat<Block, BOARD_SZ, BOARD_SZ> board_;//board
 	bool find_match();
 	void drop();

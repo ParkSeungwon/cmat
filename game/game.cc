@@ -11,8 +11,7 @@ random_device Block::rd;
 
 Block::Block()
 {
-	for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
-		color = static_cast<Color>(di(rd));
+	color = static_cast<Color>(di(rd));
 }
 
 ostream& operator<<(ostream& o, const Block& b)
@@ -33,6 +32,12 @@ ostream& operator<<(ostream& o, const Block& b)
 	}					   
 	o << c;
 	return o;
+}
+
+Board::Board()
+{
+	for(int i=0, k=0; i<BOARD_SZ; i++, k=0) for(int j=0; j<BOARD_SZ-1; j++) 
+		board_[i][j].x = i, board_[i][j].y = j;
 }
 
 bool Board::find_match()//rgbyd
@@ -88,7 +93,8 @@ void Board::remove(int x, int y, bool cross)
 void Board::transform()
 {
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) {
-		board_[i][j].level = board_[i][j].change;
+		if(board_[i][j].change != Block::Level::NORMAL)//if changed
+			board_[i][j].level = board_[i][j].change;
 		board_[i][j].change = Block::Level::NORMAL;
 	}
 }
@@ -98,6 +104,8 @@ void Board::drop()
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
 		if(board_[i][j].level == Block::Level::DELETE) 
 			board_[i][j] = get_below(i, j+1);
+	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
+		board_[i][j].x = i, board_[i][j].y = j;
 }
 
 Block Board::get_below(int x, int y)
@@ -106,7 +114,7 @@ Block Board::get_below(int x, int y)
 	if(board_[x][y].level == Block::Level::DELETE) return get_below(x, y+1);
 	else {
 		auto b = board_[x][y];
-		board_[x][y].level == Block::Level::DELETE;
+		board_[x][y].level = Block::Level::DELETE;
 		return b;
 	}
 }
