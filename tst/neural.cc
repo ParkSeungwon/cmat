@@ -32,12 +32,12 @@ TEST_CASE("binding") {
 	m[3] = "hello";
 	tuple<int, float, string> tp{2, 0.3, "hello"};
 	auto& [a,b,c] = tp;
-	cout << a << b << c;
+//	cout << a << b << c;
 	if(int i=0; i<10) cout << "ok";
 //	std::vector<double> vals = {1.0, 2.0, 3.0, 4.0};
 //	auto my_square = [](double value){return value*value;};
 //	std::for_each(std::execution::par, vals.begin(), vals.end(), my_square);
-	cout << "한글";
+//	cout << "한글";
 	any an;
 	an = 'd';
 	an = 3;

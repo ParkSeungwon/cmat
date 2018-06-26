@@ -34,7 +34,7 @@ TEST_CASE("plane test", "[plane]") {
 //	WARN("normal" << n << p.normal());
 	Cmat<float, 2, 2> c, d;
 	auto e = c - d;
-	WARN(e-c);
+//	WARN(e-c);
 }
 
 TEST_CASE("array init") {
@@ -67,7 +67,7 @@ template<const char* T> struct A {
 constexpr char p[] = "hello";
 TEST_CASE("const char") {
 	//A<"hello"> a;
-	A<p> b;
-	cout << "hello2" << endl;
+//	A<p> b;
+//	cout << "hello2" << endl;
 }
 

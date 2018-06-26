@@ -78,16 +78,18 @@ bool Board::find_match()//rgbyd
 
 void Board::remove(int x, int y, bool cross)
 {
+	if(x < 0 || x >= BOARD_SZ || y < 0 || y >= BOARD_SZ) return;
 	if(cross && board_[x][y].change != Block::Level::NORMAL)//for cross delete
-		board_[x][y].change = Block::Level::DIAMOND;
-	else board_[x][y].change = Block::Level::DELETE;
-	if(board_[x][y].level == Block::Level::EXPLOSIVE) 
-		for(int i : {-1, 1}) for(int j : {-1, 1})
-			if(x+i >= 0 && x+i < BOARD_SZ && y+j >= 0 && y+j < BOARD_SZ) 
-				remove(x+i, y+j, false);
-	else if(board_[x][y].level == Block::Level::DIAMOND)
+		board_[x][y].change = Block::Level::DIAMOND;//generate diamond
+	else board_[x][y].change = Block::Level::DELETE;//remove block
+	if(board_[x][y].level == Block::Level::EXPLOSIVE) {
+		board_[x][y].level = Block::Level::NORMAL;
+		for(int i : {-1, 1}) remove(x+i, y, false), remove(x, y+i, false);
+	} else if(board_[x][y].level == Block::Level::DIAMOND) {
+		board_[x][y].level = Block::Level::NORMAL;
 		for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
 			if(board_[i][j] == board_[x][y]) remove(i, j, false);
+	}
 }
 
 void Board::transform()
