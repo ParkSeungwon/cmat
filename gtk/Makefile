@@ -1,5 +1,5 @@
 CFLAG = -g -c -std=c++14 -fmax-errors=1
-INCLUDE = -I../ -I../src
+INCLUDE = -I../ -I../src -I/usr/include/opencv
 GTKCFLAG = $(shell pkg-config gtkmm-3.0 --cflags) #-I$(ROOT)
 CC = g++
 OBJ = $(patsubst %.cc, ../obj/%.o, $(wildcard *.cc))
