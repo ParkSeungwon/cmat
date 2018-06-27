@@ -1,3 +1,4 @@
+#include<utility>
 #include<iostream>
 #include"game.h"
 using namespace std;
@@ -138,62 +139,19 @@ bool Board::swap(int x, int y, char c)
 		default: return false;
 	}
 	if(!is_valid(x, y) || !is_valid(x2, y2)) return false;
-	if(check(x2, y2, board_[x][y]) || check(x, y, board_[x2][y2])) {
-		auto b = board_[x][y];
-		board_[x][y] = board_[x2][y2];
-		board_[x2][y2] = b;
-		return true;
-	} else return false;
+	bool ok = false;
+	std::swap(board_[x][y], board_[x2][y2]);
+	backup_ = board_;
+	if(find_match()) ok = true;
+	board_ = backup_;
+	if(ok) return true;
+	else {
+		std::swap(board_[x][y], board_[x2][y2]);//recover
+		return false;
+	}
 }
-
-bool Board::check(int x, int y, Block b) const
-{
-	if(r_check(x+1, y, b) + l_check(x-1, y, b) > 1 || 
-			u_check(x, y-1, b) + d_check(x, y+1, b) > 1) return true;
-	else return false;
-}
-
+		
 bool Board::is_valid(int x, int y) const {
 	if(x >= 0 && x < BOARD_SZ && y >= 0 && y < BOARD_SZ) return true;
 	else return false;
 }
-
-int Board::l_check(int x, int y, Block b) const {
-	if(!is_valid(x, y)) return 0;
-	if(board_[x][y] == b) return 1 + l_check(x-1, y, b);
-	else return 0;
-}
-int Board::r_check(int x, int y, Block b) const {
-	if(!is_valid(x, y)) return 0;
-	if(board_[x][y] == b) return 1 + r_check(x+1, y, b);
-	else return 0;
-}
-int Board::u_check(int x, int y, Block b) const {
-	if(!is_valid(x, y)) return 0;
-	if(board_[x][y] == b) return 1 + u_check(x, y-1, b);
-	else return 0;
-}
-int Board::d_check(int x, int y, Block b) const {
-	if(!is_valid(x, y)) return 0;
-	if(board_[x][y] == b) return 1 + d_check(x, y+1, b);
-	else return 0;
-}
-
-
-//Block Board::get_below(int x, int y)
-//{
-//	if(y == BOARD_SZ) return Block{};
-//	if(board_[x][y].level == Block::Level::DELETE) return get_below(x, y+1);
-//	else {
-//		auto b = board_[x][y];
-//		board_[x][y].level = Block::Level::DELETE;
-//		return b;
-//	}
-//}
-//void Board::drop()
-//{
-//	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
-//		if(board_[i][j].level == Block::Level::DELETE)
-//			board_[i][j] = get_below(i, j+1), board_[i][j].x = i, board_[i][j].y = j;
-//}
-//
