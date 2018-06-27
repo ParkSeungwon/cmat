@@ -1,3 +1,4 @@
+#include<iostream>
 #include"game.h"
 using namespace std;
 
@@ -16,7 +17,7 @@ Block::Block()
 
 ostream& operator<<(ostream& o, const Block& b)
 {
-	char c;
+	char c; 
 	switch(b.color) {
 		case Block::Color::RED: c = 'r'; break;
 		case Block::Color::GREEN: c = 'g'; break;
@@ -26,7 +27,7 @@ ostream& operator<<(ostream& o, const Block& b)
 	}
 	switch(b.level) {
 		case Block::Level::EXPLOSIVE: c = toupper(c); break;
-		case Block::Level::DIAMOND: c = '+'; break;
+		case Block::Level::DIAMOND: c = static_cast<char>(b.color) + '1'; break;
 		case Block::Level::DELETE: c = ' '; break;
 		default: break;
 	}					   
@@ -49,6 +50,7 @@ void Board::turn_finish()
 {
 	for(int i=0, k=0; i<BOARD_SZ; i++, k=0) for(int j=0; j<BOARD_SZ-1; j++) 
 		board_[i][j].x = i, board_[i][j].y = j;
+	cout << "-----------------------------------" << endl;
 }
 
 bool Board::find_match()//rgbyd
@@ -89,7 +91,7 @@ bool Board::find_match()//rgbyd
 
 void Board::remove(int x, int y, bool cross)
 {
-	if(x < 0 || x >= BOARD_SZ || y < 0 || y >= BOARD_SZ) return;
+	if(!is_valid(x, y)) return;
 	if(cross && board_[x][y].change != Block::Level::NORMAL)//for cross delete
 		board_[x][y].change = Block::Level::DIAMOND;//generate diamond
 	else board_[x][y].change = Block::Level::DELETE;//remove block
@@ -124,6 +126,59 @@ bool Board::step_drop()
 		}
 	return blank;
 }
+
+bool Board::swap(int x, int y, char c)
+{
+	int x2 = x, y2 = y;
+	switch(c) {
+		case 'r': x2++; break;
+		case 'l': x2--; break;
+		case 'u': y2--; break;
+		case 'd': y2++; break;
+		default: return false;
+	}
+	if(!is_valid(x, y) || !is_valid(x2, y2)) return false;
+	if(check(x2, y2, board_[x][y]) || check(x, y, board_[x2][y2])) {
+		auto b = board_[x][y];
+		board_[x][y] = board_[x2][y2];
+		board_[x2][y2] = b;
+		return true;
+	} else return false;
+}
+
+bool Board::check(int x, int y, Block b) const
+{
+	if(r_check(x+1, y, b) + l_check(x-1, y, b) > 1 || 
+			u_check(x, y-1, b) + d_check(x, y+1, b) > 1) return true;
+	else return false;
+}
+
+bool Board::is_valid(int x, int y) const {
+	if(x >= 0 && x < BOARD_SZ && y >= 0 && y < BOARD_SZ) return true;
+	else return false;
+}
+
+int Board::l_check(int x, int y, Block b) const {
+	if(!is_valid(x, y)) return 0;
+	if(board_[x][y] == b) return 1 + l_check(x-1, y, b);
+	else return 0;
+}
+int Board::r_check(int x, int y, Block b) const {
+	if(!is_valid(x, y)) return 0;
+	if(board_[x][y] == b) return 1 + r_check(x+1, y, b);
+	else return 0;
+}
+int Board::u_check(int x, int y, Block b) const {
+	if(!is_valid(x, y)) return 0;
+	if(board_[x][y] == b) return 1 + u_check(x, y-1, b);
+	else return 0;
+}
+int Board::d_check(int x, int y, Block b) const {
+	if(!is_valid(x, y)) return 0;
+	if(board_[x][y] == b) return 1 + d_check(x, y+1, b);
+	else return 0;
+}
+
 
 //Block Board::get_below(int x, int y)
 //{
