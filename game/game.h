@@ -29,7 +29,8 @@ public:
 protected:
 	Cmat<Block, BOARD_SZ, BOARD_SZ> board_, backup_;//board
 private:
-	void remove(int x, int y, bool cross);
+	void remove(int x, int y);
+	void rremove(int x, int y);
 	friend std::ostream& operator<<(std::ostream& o, const Board& b);
 	bool is_valid(int x, int y) const;
 };

@@ -74,8 +74,8 @@ bool Board::find_match()//rgbyd
 	for(int i=0, k=0; i<BOARD_SZ; i++, k=0) for(int j=0; j<BOARD_SZ-1; j++) {
 		if(board_[i][j] == board_[i][j+1]) k++;//vertical scan
 		else k = 0;
-		if(k >= 2) remove(i, j+1, false), found = true;//remove last one always
-		if(k == 2) for(int n=-1; n<1; n++) remove(i, j+n, false);//remove former 2
+		if(k >= 2) remove(i, j+1), found = true;//remove last one always
+		if(k == 2) for(int n=-1; n<1; n++) remove(i, j+n);//remove former 2
 		else if(k == 3) board_[i][j+1].change = Block::Level::EXPLOSIVE;
 		else if(k == 4) board_[i][j].change = Block::Level::DIAMOND;//explo->diam
 	}
@@ -83,8 +83,8 @@ bool Board::find_match()//rgbyd
 	for(int j=0, k=0; j<BOARD_SZ; j++, k=0) for(int i=0; i<BOARD_SZ-1; i++) {
 		if(board_[i][j] == board_[i+1][j]) k++;//horizontal scan
 		else k = 0;
-		if(k >= 2) remove(i+1, j, true), found = true;//11R1 bug
-		if(k == 2) remove(i-1, j, true), remove(i, j, true);
+		if(k >= 2) remove(i+1, j), found = true;//11R1 bug
+		if(k == 2) remove(i-1, j), remove(i, j);
 		else if(k == 3) {
 			int max = 0, idx = 0;
 			for(int n=-2; n<2; n++) {
@@ -104,24 +104,31 @@ bool Board::find_match()//rgbyd
 	return found;
 }
 
-void Board::remove(int x, int y, bool cross)
+void Board::remove(int x, int y)
+{
+	board_[x][y].change = board_[x][y].change == Block::Level::DELETE ? 
+		Block::Level::DIAMOND : Block::Level::DELETE;
+}
+
+void Board::rremove(int x, int y)
 {
 	if(!is_valid(x, y)) return;
-	if(cross && board_[x][y].change != Block::Level::NORMAL)//for cross delete
-		board_[x][y].change = Block::Level::DIAMOND;//generate diamond
-	else board_[x][y].change = Block::Level::DELETE;//remove block
+	if(board_[x][y].change == Block::Level::NORMAL)
+		board_[x][y].change = Block::Level::DELETE;//remove block
 	if(board_[x][y].level == Block::Level::EXPLOSIVE) {
 		board_[x][y].level = Block::Level::NORMAL;
-		for(int i : {-1, 1}) remove(x+i, y, false), remove(x, y+i, false);
+		for(int i : {-1, 1}) rremove(x+i, y), rremove(x, y+i);
 	} else if(board_[x][y].level == Block::Level::DIAMOND) {
 		board_[x][y].level = Block::Level::NORMAL;
 		for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
-			if(board_[i][j] == board_[x][y]) remove(i, j, false);
+			if(board_[i][j] == board_[x][y]) rremove(i, j);
 	}
 }
 
 void Board::transform()
 {
+	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
+		if(board_[i][j].change != Block::Level::NORMAL) rremove(i, j);
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) {
 		if(board_[i][j].change != Block::Level::NORMAL)//if changed
 			board_[i][j].level = board_[i][j].change, score++;
