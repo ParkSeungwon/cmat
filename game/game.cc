@@ -43,7 +43,15 @@ ostream& operator<<(ostream& o, const Board& b)
 }
 
 Board::Board()
-{
+{//initialize board with no match
+	turn_finish();
+	while(find_match()) {
+		transform();
+		step_drop();
+		turn_finish();
+	}
+	for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
+		board_[i][j].level = Block::Level::NORMAL;
 	turn_finish();
 }
 
@@ -57,7 +65,7 @@ void Board::turn_finish()
 {
 	for(int i=0, k=0; i<BOARD_SZ; i++, k=0) for(int j=0; j<BOARD_SZ-1; j++) 
 		board_[i][j].x = i, board_[i][j].y = j;
-	cout << "-----------------------------------" << endl;
+	cout << "---------------------------------" << endl;
 }
 
 bool Board::find_match()//rgbyd
@@ -75,7 +83,7 @@ bool Board::find_match()//rgbyd
 	for(int j=0, k=0; j<BOARD_SZ; j++, k=0) for(int i=0; i<BOARD_SZ-1; i++) {
 		if(board_[i][j] == board_[i+1][j]) k++;//horizontal scan
 		else k = 0;
-		if(k >= 2) remove(i+1, j, true), found = true;
+		if(k >= 2) remove(i+1, j, true), found = true;//11R1 bug
 		if(k == 2) remove(i-1, j, true), remove(i, j, true);
 		else if(k == 3) {
 			int max = 0, idx = 0;
@@ -116,7 +124,7 @@ void Board::transform()
 {
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) {
 		if(board_[i][j].change != Block::Level::NORMAL)//if changed
-			board_[i][j].level = board_[i][j].change;
+			board_[i][j].level = board_[i][j].change, score++;
 		board_[i][j].change = Block::Level::NORMAL;
 	}
 }

@@ -5,7 +5,7 @@ using namespace std;
 using namespace cv;
 
 Scalar clr[6] = {
-	{255,0,0},{0,255,0}, {0,0,255}, {0, 255, 255}, {0,0,0}, {255,255,255}};
+	{0,0,255},{0,255,0}, {255,0,0}, {0, 255, 255}, {0,0,0}, {255,255,255}};
 class CVBoard : public Mat
 {
 public:
@@ -16,7 +16,7 @@ public:
 					clr[b.get_color(i, j)], CV_FILLED);
 		imshow("game", *this);
 		cout << b << endl;
-		waitKey(1000);
+		waitKey(200);
 	}
 };
 int from_x, from_y;
@@ -24,7 +24,7 @@ void on_mouse(int event, int x, int y, int, void*)
 {
 	if(event == CV_EVENT_LBUTTONDOWN) {
 		from_x = x / 50, from_y = y / 50;
-		cout << "selected " << x << " and " << y << endl;
+		cout << "selected " << from_x << " and " << from_y << endl;
 	}
 }
 
@@ -41,6 +41,8 @@ int main()
 			while(board.step_drop()) b = board;
 			board.turn_finish();
 		}
+		cout << "score : " << board.score << endl;
+		board.score = 0;
 		do {
 			c = waitKey(0);
 			if(c == 'q') break;
