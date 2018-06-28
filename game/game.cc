@@ -58,7 +58,12 @@ Board::Board()
 int Board::get_color(int x, int y) const
 {
 	if(board_[x][y].level == Block::Level::DELETE) return 5;
-	else return static_cast<int>(board_[x][y].color);
+	else {
+		int r = static_cast<int>(board_[x][y].color);
+		if(board_[x][y].level == Block::Level::EXPLOSIVE) r += 6;
+		if(board_[x][y].level == Block::Level::DIAMOND) r += 12;
+		return r;
+	}
 }
 
 void Board::turn_finish()
@@ -110,25 +115,25 @@ void Board::remove(int x, int y)
 		Block::Level::DIAMOND : Block::Level::DELETE;
 }
 
-void Board::rremove(int x, int y)
+void Board::trigger(int x, int y)
 {
 	if(!is_valid(x, y)) return;
 	if(board_[x][y].change == Block::Level::NORMAL)
 		board_[x][y].change = Block::Level::DELETE;//remove block
 	if(board_[x][y].level == Block::Level::EXPLOSIVE) {
 		board_[x][y].level = Block::Level::NORMAL;
-		for(int i : {-1, 1}) rremove(x+i, y), rremove(x, y+i);
+		for(int i : {-1, 1}) trigger(x+i, y), trigger(x, y+i);
 	} else if(board_[x][y].level == Block::Level::DIAMOND) {
 		board_[x][y].level = Block::Level::NORMAL;
 		for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
-			if(board_[i][j] == board_[x][y]) rremove(i, j);
+			if(board_[i][j] == board_[x][y]) trigger(i, j);
 	}
 }
 
 void Board::transform()
 {
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
-		if(board_[i][j].change != Block::Level::NORMAL) rremove(i, j);
+		if(board_[i][j].change != Block::Level::NORMAL) trigger(i, j);
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) {
 		if(board_[i][j].change != Block::Level::NORMAL)//if changed
 			board_[i][j].level = board_[i][j].change, score++;

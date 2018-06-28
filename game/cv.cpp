@@ -11,9 +11,12 @@ class CVBoard : public Mat
 public:
 	CVBoard() : Mat(50 * BOARD_SZ, 50 * BOARD_SZ, CV_8UC3, {255,255,255}) {}
 	CVBoard& operator=(const Board& b) {
-		for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
-			rectangle(*this, {i*50, j*50}, {i*50+50, j*50+50}, 
-					clr[b.get_color(i, j)], CV_FILLED);
+		for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) {
+			int k = b.get_color(i, j);
+			rectangle(*this, {i*50, j*50}, {i*50+50, j*50+50}, clr[k % 6], CV_FILLED);
+			if(k > 5) rectangle(*this, {i*50+5, j*50+5}, {i*50+45, j*50+45}, clr[5]);
+			if(k > 11) rectangle(*this,{i*50+10, j*50+10}, {i*50+40, j*50+40}, clr[5]);
+		}
 		imshow("game", *this);
 		cout << b << endl;
 		waitKey(200);
