@@ -24,6 +24,7 @@ public:
 	void transform();
 	void turn_finish();
 	bool swap(int x, int y, char c);
+	int get_color(int x, int y) const;
 protected:
 	Cmat<Block, BOARD_SZ, BOARD_SZ> board_, backup_;//board
 private:

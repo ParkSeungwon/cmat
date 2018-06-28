@@ -4,21 +4,49 @@
 using namespace std;
 using namespace cv;
 
-int from_x, from_y, to_x, to_y;
+Scalar clr[6] = {
+	{255,0,0},{0,255,0}, {0,0,255}, {0, 255, 255}, {0,0,0}, {255,255,255}};
+class CVBoard : public Mat
+{
+public:
+	CVBoard() : Mat(50 * BOARD_SZ, 50 * BOARD_SZ, CV_8UC3, {255,255,255}) {}
+	CVBoard& operator=(const Board& b) {
+		for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
+			rectangle(*this, {i*50, j*50}, {i*50+50, j*50+50}, 
+					clr[b.get_color(i, j)], CV_FILLED);
+		imshow("game", *this);
+		cout << b << endl;
+		waitKey(1000);
+	}
+};
+int from_x, from_y;
 void on_mouse(int event, int x, int y, int, void*)
 {
-	if(event == CV_EVENT_LBUTTONDOWN) from_x = x, from_y = y;
-	else if(event == CV_EVENT_LBUTTONUP) {
-		to_x = x, to_y = y;
-
+	if(event == CV_EVENT_LBUTTONDOWN) {
+		from_x = x / 50, from_y = y / 50;
+		cout << "selected " << x << " and " << y << endl;
 	}
 }
 
 int main()
 {
-	Mat img(50 * BOARD_SZ, 50 * BOARD_SZ, CV_8UC3, {0,0,0});
-	imshow("game", img);
-	waitKey(0);
+	Board board;
+	CVBoard b;
+	b = board;
+	setMouseCallback("game", on_mouse, 0);
+	for(char c; c != 'q';) {
+		while(board.find_match()) {
+			board.transform();
+			b = board;
+			while(board.step_drop()) b = board;
+			board.turn_finish();
+		}
+		do {
+			c = waitKey(0);
+			if(c == 'q') break;
+		} while(!board.swap(from_x, from_y, c));
+		b = board;
+	}
 }
 
 

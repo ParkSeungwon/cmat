@@ -47,6 +47,12 @@ Board::Board()
 	turn_finish();
 }
 
+int Board::get_color(int x, int y) const
+{
+	if(board_[x][y].level == Block::Level::DELETE) return 5;
+	else return static_cast<int>(board_[x][y].color);
+}
+
 void Board::turn_finish()
 {
 	for(int i=0, k=0; i<BOARD_SZ; i++, k=0) for(int j=0; j<BOARD_SZ-1; j++) 
@@ -132,10 +138,10 @@ bool Board::swap(int x, int y, char c)
 {
 	int x2 = x, y2 = y;
 	switch(c) {
-		case 'r': x2++; break;
-		case 'l': x2--; break;
-		case 'u': y2--; break;
-		case 'd': y2++; break;
+		case 'd': x2++; break;
+		case 'a': x2--; break;
+		case 'w': y2--; break;
+		case 's': y2++; break;
 		default: return false;
 	}
 	if(!is_valid(x, y) || !is_valid(x2, y2)) return false;
