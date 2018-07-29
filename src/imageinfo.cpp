@@ -1,7 +1,7 @@
 #include<iostream>
 #include<string>
 #include<highgui.h>
-#include"base.h"
+#include"matrix/base.h"
 #include"blender-32x32.xpm"
 using namespace std;
 using namespace cv;

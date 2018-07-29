@@ -3,7 +3,7 @@
 #include<functional>
 #include<fstream>
 #include<algorithm>
-#include"base.h"
+#include"cmat.h"
 
 template<unsigned Idx, unsigned W, unsigned H> class Weight {
 protected:

@@ -1,7 +1,6 @@
 #include<iostream>
 #include<catch.hpp>
-#include"vec.h"
-#include"4x4.h"
+#include"matrix/cmat.h"
 using namespace std;
 
 TEST_CASE("vecor specialization test", "[cmat]") {

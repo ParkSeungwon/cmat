@@ -1,5 +1,3 @@
-#include"4x4.h"
-#include"vec.h"
 #include"plane.h"
 using namespace std;
 using mat4 = Cmat<float, 4, 4>;

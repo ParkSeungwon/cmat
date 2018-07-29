@@ -1,7 +1,7 @@
 #pragma once
 #include<ostream>
 #include<random>
-#include"base.h"
+#include"matrix/base.h"
 #define BOARD_SZ 7
 
 class Block

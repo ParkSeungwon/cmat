@@ -1,8 +1,7 @@
 #include<vector>
 #include<iostream>
 #include<catch.hpp>
-#include"4x4.h"
-#include"vec.h"
+#include"matrix/cmat.h"
 using namespace std;
 
 TEST_CASE("main class test", "[base]") {

@@ -7,9 +7,8 @@
 #include<complex>
 #include"projectile.h"
 #include"globj.h"
-#include"vec.h"
 #include"plane.h"
-#include"4x4.h"
+#include"matrix/cmat.h"
 #define STEP 0.05
 using namespace std;
 bool glinit(GLFWwindow* window);

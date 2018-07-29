@@ -6,10 +6,9 @@
 #include<map>
 #include<algorithm>
 #include<any>
-#include"vec.h"
-#include"4x4.h"
+#include"matrix/cmat.h"
 #include"plane.h"
-#include"neural.h"
+#include"matrix/neural.h"
 #include"mtl.h"
 using namespace std::chrono;
 using namespace std;

@@ -1,5 +1,4 @@
-#include"vec.h"
-#include"4x4.h"
+#include"matrix/cmat.h"
 using vec4 = Cmat<float, 1, 4>;
 using mat4 = Cmat<float, 4, 4>;
 

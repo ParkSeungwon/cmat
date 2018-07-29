@@ -1,5 +1,5 @@
 #include<map>
-#include"vec.h"
+#include"matrix/cmat.h"
 using vec3 = Cmat<float, 1, 3>;
 
 struct MTL 
