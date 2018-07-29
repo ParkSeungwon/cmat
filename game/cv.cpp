@@ -19,7 +19,7 @@ public:
 		}
 		imshow("game", *this);
 		cout << b << endl;
-		waitKey(200);
+		waitKey(300);
 	}
 };
 int from_x, from_y;
@@ -37,6 +37,7 @@ int main()
 	CVBoard b;
 	b = board;
 	setMouseCallback("game", on_mouse, 0);
+	int k = 0; float sum = 0;
 	for(char c; c != 'q';) {
 		while(board.find_match()) {
 			board.transform();
@@ -44,8 +45,7 @@ int main()
 			while(board.step_drop()) b = board;
 			board.turn_finish();
 		}
-		cout << "score : " << board.score << endl;
-		board.score = 0;
+		board.score();
 		do {
 			c = waitKey(0);
 			if(c == 'q') break;

@@ -12,7 +12,7 @@ static uniform_int_distribution<int> di{0,4};
 static random_device rd;
 
 Block::Block()
-{
+{//random generation of a block
 	color = static_cast<Color>(di(rd));
 }
 
@@ -20,16 +20,16 @@ ostream& operator<<(ostream& o, const Block& b)
 {
 	char c; 
 	switch(b.color) {
-		case Block::Color::RED: c = 'r'; break;
-		case Block::Color::GREEN: c = 'g'; break;
-		case Block::Color::BLUE: c = 'b'; break;
-		case Block::Color::GOLD: c = 'l'; break;
-		case Block::Color::BLACK: c = 'd'; break;
+		case Block::Color::RED: 	c = 'r'; break;
+		case Block::Color::GREEN: 	c = 'g'; break;
+		case Block::Color::BLUE: 	c = 'b'; break;
+		case Block::Color::GOLD: 	c = 'l'; break;
+		case Block::Color::BLACK: 	c = 'd'; break;
 	}
 	switch(b.level) {
-		case Block::Level::EXPLOSIVE: c = toupper(c); break;
-		case Block::Level::DIAMOND: c = static_cast<char>(b.color) + '1'; break;
-		case Block::Level::DELETE: c = ' '; break;
+		case Block::Level::EXPLOSIVE: 	c = toupper(c); 						break;
+		case Block::Level::DIAMOND: 	c = static_cast<char>(b.color) + '1'; 	break;
+		case Block::Level::DELETE: 		c = ' '; 								break;
 		default: break;
 	}					   
 	o << c;
@@ -53,10 +53,23 @@ Board::Board()
 	for(int i=0; i<BOARD_SZ; i++) for(int j=0; j<BOARD_SZ; j++) 
 		board_[i][j].level = Block::Level::NORMAL;
 	turn_finish();
+	score_ = 0;
 }
 
+void Board::score()
+{//count removed block
+	static float sum = 0;
+	static int k = 0;
+	if(k) {
+		cout << "turn : " << k << endl << "score : " << score_ << endl;
+		sum += score_;
+		cout << "avg : " << sum / k++ << endl;
+		score_ = 0;
+	} else k++;
+}
+	
 int Board::get_color(int x, int y) const
-{
+{//get attribute of block x, y
 	if(board_[x][y].level == Block::Level::DELETE) return 5;
 	else {
 		int r = static_cast<int>(board_[x][y].color);
@@ -116,7 +129,7 @@ void Board::remove(int x, int y)
 }
 
 void Board::trigger(int x, int y)
-{
+{//recursive removing of blocks
 	if(!is_valid(x, y)) return;
 	if(board_[x][y].change == Block::Level::NORMAL)
 		board_[x][y].change = Block::Level::DELETE;//remove block
@@ -131,31 +144,30 @@ void Board::trigger(int x, int y)
 }
 
 void Board::transform()
-{
+{//remove or change blocks after settlement
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
 		if(board_[i][j].change != Block::Level::NORMAL) trigger(i, j);
 	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) {
 		if(board_[i][j].change != Block::Level::NORMAL)//if changed
-			board_[i][j].level = board_[i][j].change, score++;
+			board_[i][j].level = board_[i][j].change, score_++;
 		board_[i][j].change = Block::Level::NORMAL;
 	}
 }
 
 bool Board::step_drop()
-{
+{//go up, influenced by puzzle empire
 	bool blank = false;
-	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) 
-		if(board_[i][j].level == Block::Level::DELETE) {
-			for(int k=j; k<BOARD_SZ-1; k++) board_[i][k] = board_[i][k+1];
-			board_[i][BOARD_SZ-1] = Block{};
-			blank = true;
-			break;
-		}
+	for(int i=0,k=0; i<BOARD_SZ; i++,k=0) for(int j=0; j<BOARD_SZ; j++) if(board_[i][j].level == Block::Level::DELETE) {
+		for(int k=j; k<BOARD_SZ-1; k++) board_[i][k] = board_[i][k+1];
+		board_[i][BOARD_SZ-1] = Block{};
+		blank = true;
+		break;
+	}
 	return blank;
 }
 
 bool Board::swap(int x, int y, char c)
-{
+{//drag a piece to change position
 	int x2 = x, y2 = y;
 	switch(c) {
 		case 'd': x2++; break;
@@ -165,19 +177,20 @@ bool Board::swap(int x, int y, char c)
 		default: return false;
 	}
 	if(!is_valid(x, y) || !is_valid(x2, y2)) return false;
-	bool ok = false;
+
 	std::swap(board_[x][y], board_[x2][y2]);
 	backup_ = board_;
-	if(find_match()) ok = true;
+	bool is_legal_move = find_match();
 	board_ = backup_;
-	if(ok) return true;
+	if(is_legal_move) return true;
 	else {
 		std::swap(board_[x][y], board_[x2][y2]);//recover
 		return false;
 	}
 }
 		
-bool Board::is_valid(int x, int y) const {
+bool Board::is_valid(int x, int y) const
+{//border check
 	if(x >= 0 && x < BOARD_SZ && y >= 0 && y < BOARD_SZ) return true;
 	else return false;
 }

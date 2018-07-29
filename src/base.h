@@ -28,9 +28,9 @@ template<class T, unsigned W, unsigned H> struct CmatBase
 	}
 	CmatBase(cv::Mat r) {
 		assert(W == r.cols && H == r.rows);
-		assert((std::is_same<T, std::array<unsigned, 3>>::value));
+		assert((std::is_same<T, std::array<unsigned, 3>>::value));//3UC8
 		for(int i=0; i<W; i++) for(int j=0; j<H; j++) for(int k=0; k<3; k++)
-			(*this)[i][j][k] = r.at<cv::Vec3b>(j, i)[2 - k];
+			(*this)[i][j][k] = r.at<cv::Vec3b>(j, i)[2 - k];//BGR->RGB
 	}
 	int width() const { return width_; }
 	int height() const { return height_; }

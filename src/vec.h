@@ -6,7 +6,7 @@ template<class T, unsigned N> struct Cmat<T, 1, N> : public CmatBase<T, 1, N>
 	Cmat() = default;
 	Cmat(std::initializer_list<T> li) : CmatBase<T, 1, N>{li} {}
 	Cmat(CmatBase<T, 1, N> r) { this->arr_ = r.arr_; }
-	T operator,(const Cmat<T, 1, N>& r) const{
+	T operator,(const Cmat<T, 1, N>& r) const{//dot product
 		T sum = 0;
 		for(int i=0; i<N; i++) sum += (*this)[0][i] * r[0][i];
 		return sum;

@@ -25,8 +25,9 @@ public:
 	void turn_finish();
 	bool swap(int x, int y, char c);
 	int get_color(int x, int y) const;
-	int score = 0;
+	void score();
 protected:
+	int score_ = 0;
 	Cmat<Block, BOARD_SZ, BOARD_SZ> board_, backup_;//board
 private:
 	void remove(int x, int y);
