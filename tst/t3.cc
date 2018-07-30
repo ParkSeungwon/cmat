@@ -27,7 +27,7 @@ TEST_CASE("main class test", "[base]") {
 
 	SECTION("inverse") {
 		auto m4 = m3 * m3.I();
-		INFO("E\n" << m4);
+//		INFO("E\n" << m4);
 		for(int i=0; i<4; i++) for(int j=0; j<4; j++) 
 			if(i == j) REQUIRE(m4[i][j] == Approx(1).scale(1));
 			else REQUIRE(m4[i][j] == Approx(0).scale(1));

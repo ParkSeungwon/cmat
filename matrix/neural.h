@@ -55,8 +55,8 @@ public:
 			init<Di, Idx + 1>(di);
 		}
 	}
-	void transfer_function(std::function<float(float)> f) { transfer_function_ = f; }
-	void diff_transfer(std::function<float(float)> f) { diff_transfer_ = f; }
+	void transfer_function(std::function<float(float)> f) { activation_function_ = f; }
+	void diff_transfer(std::function<float(float)> f) { diff_activation_ = f; }
 	auto feed_forward(std::vector<float> v) {
 		for(int i=0; i<v.size(); i++) layer<0>(*this)[0][i] = v[i];
 		feed_forward();
@@ -67,7 +67,7 @@ public:
 		auto& d = delta<sizeof...(Ns) - 1>(*this);
 		for(int i = 0; i < d.height(); i++) {
 			float o = layer<sizeof...(Ns) - 1>(*this)[0][i];
-			d[0][i] = (v[i] - o) * diff_transfer_(o);//??? (o)
+			d[0][i] = (v[i] - o) * diff_activation_(o);//??? (o)
 			err += (v[i] - o ) * (v[i] - o);
 		}
 		calc_delta();
@@ -84,16 +84,11 @@ public:
 	}
 protected:
 	std::function<float(float)>
-		transfer_function_ = bind(&NeuralNet::transfer, this, std::placeholders::_1),
-		diff_transfer_ = bind(&NeuralNet::diff, this, std::placeholders::_1);
+		activation_function_ = sigmoid, diff_activation_ = diff_sigmoid;
 private:
 	std::random_device rd_;
-	float transfer(float x) { return 1 / (1 + exp(-x)); }
-	float diff(float x) { return transfer(x) * (1 - transfer(x)); }
-//	std::function<float(float)> transfer_function_
-//		= [](float x) {return 1 / (1 + exp(-x));};//sigmoid default
-//	std::function<float(float)> diff_transfer_
-//		= [this](float x) {return transfer_function_(x)(1 - transfer_function_(x));};
+	static float sigmoid(float x) { return 1 / (1 + exp(-x)); }
+	static float diff_sigmoid(float x) { return sigmoid(x) * (1 - sigmoid(x)); }
 	template<unsigned Idx = 0> void save_weights(std::ostream& o) {
 		if constexpr(Idx < sizeof...(Ns) - 1) {
 			o << weight<Idx>(*this) << std::endl;
@@ -123,7 +118,7 @@ private:
 			layer<Idx + 1>(*this) = weight<Idx>(*this) * add_bias(layer<Idx>(*this));
 			auto& a = layer<Idx + 1>(*this).arr_[0];
 			if(Idx + 1 != sizeof...(Ns) - 1) 
-				transform(a.begin(), a.end(), a.begin(), transfer_function_);
+				transform(a.begin(), a.end(), a.begin(), activation_function_);
 			feed_forward<Idx + 1>();
 		}
 	}
@@ -134,7 +129,7 @@ private:
 				float o = layer<Idx>(*this)[0][i], sum = 0;
 				for(int j=0; j<w.height(); j++)
 					sum += w[i][j] * delta<Idx>(*this)[0][j];
-				delta<Idx - 1>(*this)[0][i] = sum * diff_transfer_(layer<Idx>(*this)[0][i]);
+				delta<Idx - 1>(*this)[0][i] = sum * diff_activation_(layer<Idx>(*this)[0][i]);
 			}
 			calc_delta<Idx - 1>();
 		}
