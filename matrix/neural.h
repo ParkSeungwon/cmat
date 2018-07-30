@@ -5,44 +5,35 @@
 #include<algorithm>
 #include"cmat.h"
 
-template<unsigned Idx, unsigned W, unsigned H> class Weight {
-protected:
-	Cmat<float, W+1, H> mat;//+1 = bias
+template<unsigned Idx, unsigned W, unsigned H> class Layer {
+protected://weight * input = output ->activation -> input
+	Cmat<float, W+1, H> weight;//+1 = bias
+	Cmat<float, 1, W> input;
+	Cmat<float, 1, W> delta;
+	Cmat<float, 1, H> output;//before activation
 };
-template<unsigned Idx, unsigned H> class Layer {
-protected:
-	Cmat<float, 1, H> mat;
-};
-template<unsigned Idx, unsigned H> class Delta {
-protected:
-	Cmat<float, 1, H> mat;
-};
-
 template<unsigned Idx, unsigned... Ns> struct Neural {};
 template<unsigned Idx, unsigned N1, unsigned N2, unsigned... Ns>
-struct Neural<Idx, N1, N2, Ns...>
-	: Neural<Idx + 1, N2, Ns...>, Weight<Idx, N1, N2>, Layer<Idx, N1>, Delta<Idx, N1>
+struct Neural<Idx, N1, N2, Ns...> : Neural<Idx + 1, N2, Ns...>, Layer<Idx, N1, N2>
 {//recursive specialization
-	auto& weight() { return Weight<Idx, N1, N2>::mat; }
-	auto& layer() { return Layer<Idx, N1>::mat; }
-	auto& delta() { return Delta<Idx, N1>::mat; }
+	auto& weight() { return Layer<Idx, N1, N2>::weight; }
+	auto& input() { return Layer<Idx, N1, N2>::input; }
+	auto& delta() { return Layer<Idx, N1, N2>::delta; }
+	auto& output() { return Layer<Idx, N1, N2>::output; }
 };
-template<unsigned Idx, unsigned N> struct Neural<Idx, N>
-	: Layer<Idx, N>, Delta<Idx, N>
-{//termination
-	const int sz_ = Idx + 1;//parameter size
-	auto& layer() { return Layer<Idx, N>::mat; }
-	auto& delta() { return Delta<Idx, N>::mat; }
-};
+template<unsigned Idx, unsigned N> struct Neural<Idx, N> { };//termination
 
 template<unsigned Idx, unsigned... Ns> auto& weight(Neural<Idx, Ns...>& r) {
 	return r.weight();//tuple like getter
 }
-template<unsigned Idx, unsigned... Ns> auto& layer(Neural<Idx, Ns...>& r) {
-	return r.layer();
+template<unsigned Idx, unsigned... Ns> auto& input(Neural<Idx, Ns...>& r) {
+	return r.input();
 }
 template<unsigned Idx, unsigned... Ns> auto& delta(Neural<Idx, Ns...>& r) {
 	return r.delta();
+}
+template<unsigned Idx, unsigned... Ns> auto& output(Neural<Idx, Ns...>& r) {
+	return r.output();
 }
 
 template<unsigned... Ns> class NeuralNet : public Neural<0, Ns...> {
@@ -55,18 +46,20 @@ public:
 			init<Di, Idx + 1>(di);
 		}
 	}
-	void transfer_function(std::function<float(float)> f) { activation_function_ = f; }
-	void diff_transfer(std::function<float(float)> f) { diff_activation_ = f; }
+	void activation_function(std::function<float(float)> f) {
+		activation_function_ = f;
+	}
+	void diff_activation(std::function<float(float)> f) { diff_activation_ = f; }
 	auto feed_forward(std::vector<float> v) {
-		for(int i=0; i<v.size(); i++) layer<0>(*this)[0][i] = v[i];
+		for(int i=0; i<v.size(); i++) input<0>(*this)[0][i] = v[i];
 		feed_forward();
-		return layer<sizeof...(Ns) - 1>(*this);
+		return output<sizeof...(Ns) - 2>(*this);
 	}
 	float back_propagation(std::vector<float> v, float alpha = 0.1) {
 		float err = 0;
-		auto& d = delta<sizeof...(Ns) - 1>(*this);
+		auto& d = delta<sizeof...(Ns) - 2>(*this);
 		for(int i = 0; i < d.height(); i++) {
-			float o = layer<sizeof...(Ns) - 1>(*this)[0][i];
+			float o = output<sizeof...(Ns) - 2>(*this)[0][i];
 			d[0][i] = (v[i] - o) * diff_activation_(o);//??? (o)
 			err += (v[i] - o ) * (v[i] - o);
 		}
@@ -115,21 +108,23 @@ private:
 	}
 	template<unsigned Idx = 0> void feed_forward() {
 		if constexpr(Idx < sizeof...(Ns) - 1) {
-			layer<Idx + 1>(*this) = weight<Idx>(*this) * add_bias(layer<Idx>(*this));
-			auto& a = layer<Idx + 1>(*this).arr_[0];
-			if(Idx + 1 != sizeof...(Ns) - 1) 
-				transform(a.begin(), a.end(), a.begin(), activation_function_);
+			output<Idx>(*this) = weight<Idx>(*this) * add_bias(input<Idx>(*this));
+			if constexpr(Idx + 1 < sizeof...(Ns) - 1) {//activation
+				auto& o = output<Idx>(*this).arr_[0];
+				auto& i = input<Idx + 1>(*this).arr_[0];
+				transform(o.begin(), o.end(), i.begin(), activation_function_);
+			}
 			feed_forward<Idx + 1>();
 		}
 	}
-	template<unsigned Idx = sizeof...(Ns) - 1> void calc_delta() {
+	template<unsigned Idx = sizeof...(Ns) - 2> void calc_delta() {
 		if constexpr(Idx > 0) {
-			const auto& w = weight<Idx - 1>(*this);
+			const auto& w = weight<Idx>(*this);
 			for(int i=0; i<w.width(); i++) {
-				float o = layer<Idx>(*this)[0][i], sum = 0;
+				float h = output<Idx>(*this)[0][i], sum = 0;
 				for(int j=0; j<w.height(); j++)
 					sum += w[i][j] * delta<Idx>(*this)[0][j];
-				delta<Idx - 1>(*this)[0][i] = sum * diff_activation_(layer<Idx>(*this)[0][i]);
+				delta<Idx - 1>(*this)[0][i] = sum * diff_activation_(h);
 			}
 			calc_delta<Idx - 1>();
 		}
@@ -138,7 +133,7 @@ private:
 		if constexpr(Idx < sizeof...(Ns) - 1) {
 			auto& w = weight<Idx>(*this);
 			for(int i=0; i<w.width(); i++) for(int j=0; j<w.height(); j++) 
-				w[i][j] += a * delta<Idx + 1>(*this)[0][i] * layer<Idx>(*this)[0][j];
+				w[i][j] += a * delta<Idx>(*this)[0][i] * output<Idx>(*this)[0][j];
 			update_weight<Idx + 1>(a);
 		}
 	}
