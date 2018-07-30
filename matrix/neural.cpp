@@ -59,9 +59,9 @@ int main()
 				v[j + 7 * i] = a[j][i] / 255.;
 			for(int i=0; i<10; i++) d[i] = label[k] == i ? 1 : 0;
 			net.feed_forward(v);
-			sum += net.back_propagation(d, .1);
+			sum += net.back_propagation(d, 1);
 		}
-		err.push_back(sum/TRAIN_SET);
+		err.push_back(sum);
 		cout << k << " epoch : ";
 		net.save_weights(to_string(k) + ".txt");
 
@@ -81,4 +81,5 @@ int main()
 	auto x = arange(0, 1, 10);
 	valarray<float> y{err.data(), 10};
 	plot(x, y);
+	for(int i=0; i<10; i++) cout << y[i] << ' ';
 }

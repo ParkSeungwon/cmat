@@ -21,7 +21,12 @@ struct Neural<Idx, N1, N2, Ns...> : Neural<Idx + 1, N2, Ns...>, Layer<Idx, N1, N
 	auto& delta() { return Layer<Idx, N1, N2>::delta; }
 	auto& output() { return Layer<Idx, N1, N2>::output; }
 };
-template<unsigned Idx, unsigned N> struct Neural<Idx, N> { };//termination
+template<unsigned Idx, unsigned N> class Neural<Idx, N> {
+public:
+	auto& result() { return result_; };
+protected:
+	Cmat<float, 1, N> result_;
+};//termination
 
 template<unsigned Idx, unsigned... Ns> auto& weight(Neural<Idx, Ns...>& r) {
 	return r.weight();//tuple like getter
@@ -34,6 +39,9 @@ template<unsigned Idx, unsigned... Ns> auto& delta(Neural<Idx, Ns...>& r) {
 }
 template<unsigned Idx, unsigned... Ns> auto& output(Neural<Idx, Ns...>& r) {
 	return r.output();
+}
+template<unsigned Idx, unsigned N> auto& result(Neural<Idx, N>& r) {
+	return r.result();
 }
 
 template<unsigned... Ns> class NeuralNet : public Neural<0, Ns...> {
@@ -53,14 +61,15 @@ public:
 	auto feed_forward(std::vector<float> v) {
 		for(int i=0; i<v.size(); i++) input<0>(*this)[0][i] = v[i];
 		feed_forward();
-		return output<sizeof...(Ns) - 2>(*this);
+		return result(*this);
 	}
 	float back_propagation(std::vector<float> v, float alpha = 0.1) {
 		float err = 0;
 		auto& d = delta<sizeof...(Ns) - 2>(*this);
 		for(int i = 0; i < d.height(); i++) {
-			float o = output<sizeof...(Ns) - 2>(*this)[0][i];
-			d[0][i] = (v[i] - o) * diff_activation_(o);//??? (o)
+			float o = result(*this)[0][i];
+			float out = output<sizeof...(Ns) - 2>(*this)[0][i];
+			d[0][i] = (v[i] - o) * diff_activation_(out);//??? (o)
 			err += (v[i] - o ) * (v[i] - o);
 		}
 		calc_delta();
@@ -113,6 +122,11 @@ private:
 				auto& o = output<Idx>(*this).arr_[0];
 				auto& i = input<Idx + 1>(*this).arr_[0];
 				transform(o.begin(), o.end(), i.begin(), activation_function_);
+			} 
+			if constexpr(Idx + 1 == sizeof...(Ns) - 2) {
+				auto& o = output<Idx>(*this).arr_[0];
+				auto& r = result(*this).arr_[0];
+				transform(o.begin(), o.end(), r.begin(), activation_function_);
 			}
 			feed_forward<Idx + 1>();
 		}
@@ -121,10 +135,11 @@ private:
 		if constexpr(Idx > 0) {
 			const auto& w = weight<Idx>(*this);
 			for(int i=0; i<w.width(); i++) {
-				float h = output<Idx>(*this)[0][i], sum = 0;
-				for(int j=0; j<w.height(); j++)
+				float sum = 0;
+				float o = output<Idx-1>(*this)[0][i];
+				for(int j=0; j<w.height(); j++) 
 					sum += w[i][j] * delta<Idx>(*this)[0][j];
-				delta<Idx - 1>(*this)[0][i] = sum * diff_activation_(h);
+				delta<Idx - 1>(*this)[0][i] = sum * diff_activation_(o);
 			}
 			calc_delta<Idx - 1>();
 		}
@@ -133,7 +148,7 @@ private:
 		if constexpr(Idx < sizeof...(Ns) - 1) {
 			auto& w = weight<Idx>(*this);
 			for(int i=0; i<w.width(); i++) for(int j=0; j<w.height(); j++) 
-				w[i][j] += a * delta<Idx>(*this)[0][i] * output<Idx>(*this)[0][j];
+				w[i][j] += a * delta<Idx>(*this)[0][i] * input<Idx>(*this)[0][j];
 			update_weight<Idx + 1>(a);
 		}
 	}
