@@ -9,7 +9,7 @@ template<unsigned Idx, unsigned W, unsigned H> class Layer {
 protected://weight * input = output ->activation -> input
 	Cmat<float, W+1, H> weight;//+1 = bias
 	Cmat<float, 1, W> input;
-	Cmat<float, 1, W> delta;
+	Cmat<float, 1, W+1> delta;
 	Cmat<float, 1, H> output;//before activation
 };
 template<unsigned Idx, unsigned... Ns> struct Neural {};
@@ -21,15 +21,13 @@ struct Neural<Idx, N1, N2, Ns...> : Neural<Idx + 1, N2, Ns...>, Layer<Idx, N1, N
 	auto& delta() { return Layer<Idx, N1, N2>::delta; }
 	auto& output() { return Layer<Idx, N1, N2>::output; }
 };
-template<unsigned Idx, unsigned N> class Neural<Idx, N> {
-public:
-	auto& result() { return result_; };
-protected:
-	Cmat<float, 1, N> result_;
-};//termination
+template<unsigned Idx, unsigned N> struct Neural<Idx, N> {//termination
+	Cmat<float, 1, N> result;
+};
 
+//tuple like getters
 template<unsigned Idx, unsigned... Ns> auto& weight(Neural<Idx, Ns...>& r) {
-	return r.weight();//tuple like getter
+	return r.weight();
 }
 template<unsigned Idx, unsigned... Ns> auto& input(Neural<Idx, Ns...>& r) {
 	return r.input();
@@ -39,9 +37,6 @@ template<unsigned Idx, unsigned... Ns> auto& delta(Neural<Idx, Ns...>& r) {
 }
 template<unsigned Idx, unsigned... Ns> auto& output(Neural<Idx, Ns...>& r) {
 	return r.output();
-}
-template<unsigned Idx, unsigned N> auto& result(Neural<Idx, N>& r) {
-	return r.result();
 }
 
 template<unsigned... Ns> class NeuralNet : public Neural<0, Ns...> {
@@ -61,13 +56,13 @@ public:
 	auto feed_forward(std::vector<float> v) {
 		for(int i=0; i<v.size(); i++) input<0>(*this)[0][i] = v[i];
 		feed_forward();
-		return result(*this);
+		return this->result;
 	}
 	float back_propagation(std::vector<float> v, float alpha = 0.1) {
 		float err = 0;
 		auto& d = delta<sizeof...(Ns) - 2>(*this);
-		for(int i = 0; i < d.height(); i++) {
-			float o = result(*this)[0][i];
+		for(int i = 0; i < d.height()-1; i++) {
+			float o = this->result[0][i];
 			float out = output<sizeof...(Ns) - 2>(*this)[0][i];
 			d[0][i] = (v[i] - o) * diff_activation_(out);//??? (o)
 			err += (v[i] - o ) * (v[i] - o);
@@ -118,14 +113,14 @@ private:
 	template<unsigned Idx = 0> void feed_forward() {
 		if constexpr(Idx < sizeof...(Ns) - 1) {
 			output<Idx>(*this) = weight<Idx>(*this) * add_bias(input<Idx>(*this));
-			if constexpr(Idx + 1 < sizeof...(Ns) - 1) {//activation
+			if constexpr(Idx < sizeof...(Ns) - 2) {//activation
 				auto& o = output<Idx>(*this).arr_[0];
 				auto& i = input<Idx + 1>(*this).arr_[0];
 				transform(o.begin(), o.end(), i.begin(), activation_function_);
 			} 
-			if constexpr(Idx + 1 == sizeof...(Ns) - 2) {
+			if constexpr(Idx == sizeof...(Ns) - 2) {
 				auto& o = output<Idx>(*this).arr_[0];
-				auto& r = result(*this).arr_[0];
+				auto& r = this->result.arr_[0];
 				transform(o.begin(), o.end(), r.begin(), activation_function_);
 			}
 			feed_forward<Idx + 1>();
@@ -147,8 +142,9 @@ private:
 	template<unsigned Idx = 0> void update_weight(float a) {
 		if constexpr(Idx < sizeof...(Ns) - 1) {
 			auto& w = weight<Idx>(*this);
+			auto in = add_bias(input<Idx>(*this));
 			for(int i=0; i<w.width(); i++) for(int j=0; j<w.height(); j++) 
-				w[i][j] += a * delta<Idx>(*this)[0][i] * input<Idx>(*this)[0][j];
+				w[i][j] += a * delta<Idx>(*this)[0][j] * in[0][i];
 			update_weight<Idx + 1>(a);
 		}
 	}
