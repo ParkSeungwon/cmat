@@ -23,10 +23,10 @@ TEST_CASE("Neural Net test") {
 	cout << input<0>(net) << weight<0>(net) << output<0>(net) << input<1>(net) << weight<1>(net) << output<1>(net) << endl;
 	for(int i=0; i<100; i++) {
 		net.back_propagation({1,0}, 1);
-		cout << output<0>(net) << weight<0>(net) << output<1>(net) << weight<1>(net) << output<2>(net) << endl;
-		cout << "predict" << endl << net.feed_forward({1,2,3});
+//		cout << output<0>(net) << weight<0>(net) << output<1>(net) << weight<1>(net) << output<2>(net) << endl;
+//		cout << "predict" << endl << net.feed_forward({1,2,3});
 	}
-	cout << delta<0>(net) << delta<1>(net) << endl;
+//	cout << delta<0>(net) << delta<1>(net) << endl;
 }
 
 TEST_CASE("binding") {
@@ -67,3 +67,22 @@ TEST_CASE("근의 공식") {
 	cout <<"적중률"<< r << endl;
 }
 
+TEST_CASE("xor") {
+	NeuralNet<2, 4, 4, 2> net;
+	uniform_real_distribution<float> di{-1,1};
+	net.init(di);
+	for(int i=0; i<1000; i++) {
+		net.feed_forward({1, 0});
+		net.back_propagation({1, 0});
+		net.feed_forward({0, 1});
+		net.back_propagation({1, 0});
+		net.feed_forward({1, 1});
+		net.back_propagation({0, 1});
+		net.feed_forward({0, 0});
+		net.back_propagation({0, 1});
+	}
+	cout << "true" << endl << net.feed_forward({1,0});
+	cout << "true" << endl << net.feed_forward({0,1});
+	cout << "false" << endl << net.feed_forward({1,1});
+	cout << "false" << endl << net.feed_forward({0,0});
+}

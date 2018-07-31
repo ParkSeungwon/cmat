@@ -4,6 +4,7 @@
 #include<fstream>
 #include<algorithm>
 #include"cmat.h"
+#include"cmatstream.h"
 
 template<unsigned Idx, unsigned W, unsigned H> class Layer {
 protected://weight * input = output ->activation -> input
@@ -149,4 +150,3 @@ private:
 		}
 	}
 };
-
