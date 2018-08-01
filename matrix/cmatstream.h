@@ -60,32 +60,34 @@ std::ostream& operator<<(std::ostream& o, CmatStream& r) {
 class NeuralNetStream
 {
 public:
-	template<unsigned... Ns> NeuralNetStream(const NeuralNet<Ns...>& r) {
-		get_parameter(Ns...);
-		int line = *max(params.begin(), params.end());
-		pretty_print(r, line);
+	template<unsigned... Ns> NeuralNetStream(NeuralNet<Ns...>& r) {
+		int line = get_max<Ns...>();
+		for(auto s : v) std::cout << s << ' ';
+		std::cout << line << " line" << std::endl;
+		pretty_print<0>(r, line);
 	}
 	void print() {
 		for(int i=0; i<v[0].linebyline.size(); i++) {
-			for(auto& a : v) o << a;
-			o << endl;
+			for(auto& a : v) std::cout << a;
+			std::cout << std::endl;
 		}
 	}
 private:
-	std::vector<unsigned> params;
 	std::vector<CmatStream> v;
-	template<unsigned N, unsigned... Ns> void get_parameter(N, Ns...) {
-		params.push_back(N);
-		get_parameter(Ns...);
+	template<unsigned N1, unsigned N2, unsigned... Ns> unsigned get_max() {
+		if constexpr(N1 > N2) return get_max<N1, Ns...>();
+		else return get_max<N2, Ns...>();
 	}
-	void get_parameter() {}
-	template<unsigned Idx = 0, unsigned... Ns>
-	void pretty_print(const Neural<Idx, Ns...>& r, int line) {
-		if constexpr(Idx < sizeof...(Ns) - 1) {
+	template<unsigned N> unsigned get_max() {
+		return N;
+	}
+	template<unsigned Idx, unsigned... Ns>
+	void pretty_print(Neural<Idx, Ns...>& r, int line) {
+		if constexpr(sizeof...(Ns) > 1) {
 			v.push_back(CmatStream{r.input(), line});
 			v.push_back(CmatStream{r.weight(), line});
 			v.push_back(CmatStream{r.output(), line});
-			pretty_print<Idx + 1>(r);
+			pretty_print<Idx + 1>(r, line);
 		}
 	}
 
