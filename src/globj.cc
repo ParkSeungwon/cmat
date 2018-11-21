@@ -1,6 +1,6 @@
 #include<fstream>
 #include<GL/glew.h>
-#include<highgui.h>
+#include<opencv2/highgui.hpp>
 #include<iostream>
 #include"globj.h"
 using namespace std;

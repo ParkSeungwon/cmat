@@ -1,12 +1,13 @@
 #include<fstream>
 #include<GL/glew.h>
-#include<highgui.h>
+#include<opencv2/highgui.hpp>
 #include<iostream>
 #include"globj.h"
 bool glinit(GLFWwindow* window);
 void init_globjects();
 unsigned make_shader_program(std::string v, std::string f);
 using namespace std;
+using namespace cv;
 
 static string vshader = R"(
 #version 130
