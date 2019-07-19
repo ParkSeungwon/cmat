@@ -8,7 +8,8 @@ float relu(float x) {
 	else return 0;
 }
 
-template<unsigned N> array<char, N> read_label(string filename) {
+template<unsigned N> array<char, N> read_label(string filename)
+{//read mnist label file, N : read n data
 	ifstream f(filename);
 	char c;
 	for(int i=0; i<8; i++) f >> noskipws >> c;
@@ -18,7 +19,8 @@ template<unsigned N> array<char, N> read_label(string filename) {
 }
 
 template<unsigned N>
-array<Cmat<unsigned char, 28, 28>, N> read_image(string filename) {
+array<Cmat<unsigned char, 28, 28>, N> read_image(string filename)
+{//read from mnist data to cmat, N : read n data
 	ifstream f(filename);
 	unsigned char c;
 	for(int i=0; i<16; i++) f >> noskipws >> c;
@@ -28,7 +30,8 @@ array<Cmat<unsigned char, 28, 28>, N> read_image(string filename) {
 	return r;
 }
 
-template<unsigned N> auto pool(Cmat<unsigned char, N, N> m) {
+template<unsigned N> auto pool(Cmat<unsigned char, N, N> m)
+{//shrink image
 	static_assert(N % 2 == 0);
 	Cmat<unsigned char, N/2, N/2> r;
 	for(int i=0; i<N; i+=2) for(int j=0; j<N; j+=2) 

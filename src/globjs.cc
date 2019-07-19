@@ -1,5 +1,6 @@
 #include<fstream>
 #include<GL/glew.h>
+#include<cxcore.hpp>
 #include<highgui.h>
 #include<iostream>
 #include"globj.h"
@@ -164,7 +165,7 @@ unsigned GLObjs::read_texture()
 	for(int i=0,j=0; i<n; i++) if(texture_files_[i] != "") { 
 		int k = texture_num_[i];
 		if(k == j) {
-			Mat im = imread(texture_files_[i]);
+			Mat im = cv::imread(texture_files_[i]);
 			glActiveTexture(GL_TEXTURE0 + j);
 			glBindTexture(GL_TEXTURE_2D, vbo[j]);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im.cols, im.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, im.data);

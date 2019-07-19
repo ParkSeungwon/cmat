@@ -9,7 +9,8 @@
 #include<string>
 #include<cmath>
 #include<type_traits>
-#include<cxcore.h>
+#include<cxcore.hpp>
+#include<map>
 //one file version
 constexpr int ct_stoi(const char* p, int value = 0) {
 	return *p == ' ' ? ct_stoi(p+1, (*p-'0') + value*10) : value;
