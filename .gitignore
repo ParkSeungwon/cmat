@@ -48,3 +48,6 @@ find
 ./obj/catch.tx
 ./.git/objects/pack/pack-c01c62c03a3bf84a896cc56c62837b5614a8587b.pack
 ./Texture.png
+mnist_weight.txt
+obj/catch.tx
+Texture.png
