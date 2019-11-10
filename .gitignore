@@ -34,3 +34,5 @@ test
 *.out
 *.app
 *.vim
+obj/catch.tx
+Texture.png

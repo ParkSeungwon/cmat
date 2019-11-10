@@ -3,7 +3,7 @@ OBJ = $(wildcard *.o)
 TOBJ = $(wildcard *.t)
 EXE = $(patsubst %.x, ../%.x, $(wildcard *.x))
 TST = $(patsubst %.tx, ../%.x, $(wildcard *.tx))
-GLLIB = -lGLEW -lGLU -lGL -lglut -lglfw 
+GLLIB = -lGLEW -lGLU -lGL -lglfw 
 cvLIB = $(shell pkg-config opencv --libs)
 
 all : $(EXE) $(TST)
